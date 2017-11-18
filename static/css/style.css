@@ -1,0 +1,40 @@
+body{
+background: #232323 !important;
+}
+
+.logincenter{
+width:320px;
+height:220px;
+position:absolute;
+left:0;
+right:0;
+top:0;
+bottom:0;
+margin:auto;
+max-width:100%;
+max-height:100%;
+overflow:hide;
+text-align:center;
+}
+
+.logincenter img{
+padding:5px;
+}
+
+.logo{
+color:#fff;
+float:left;
+padding:8px;
+}
+
+.logo h4{
+display:block;
+line-height:0;
+padding:0;
+margin:0;
+}
+
+.logo h4 small{
+position:relative;
+bottom:-8px;
+}
