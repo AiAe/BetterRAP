@@ -2,6 +2,7 @@ from flask import Flask, make_response, redirect, request, render_template, url_
 import requests
 import datetime
 import json
+from helpers import mysql
 
 with open("config.json", "r") as f:
     config = json.load(f)
@@ -36,9 +37,9 @@ def ripple_aouth():
 
     red = make_response(redirect('/'))
     red.set_cookie('ACCESS_TOKEN', ripple_token['access_token'], expires=expire_date)
-    red.set_cookie('USERID', str(user['id']), expires=expire_date)
-    red.set_cookie('USERNAME', user['username'], expires=expire_date)
-    red.set_cookie('PRIVILEGES', str(user['privileges']), expires=expire_date)
+    #red.set_cookie('USERID', str(user['id']), expires=expire_date)
+    #red.set_cookie('USERNAME', user['username'], expires=expire_date)
+    #red.set_cookie('PRIVILEGES', str(user['privileges']), expires=expire_date)
 
     return red
 
