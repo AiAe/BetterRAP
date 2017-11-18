@@ -80,18 +80,28 @@ def get_user():
 
 
 def get_privileges(p):
-    temp = ''
+    text = ''
+    staff = 0
 
     if (p & Privileges.UserNormal) > 0:
-        temp = 'User'
-    if (p & Privileges.AdminChatMod) > 0:
-        temp = 'Chat mod'
-    if (p & Privileges.AdminBanUsers) > 0:
-        temp = 'Community Manager'
-    if (p & Privileges.AdminManagePrivileges) > 0:
-        temp = 'Developer'
+        text = 'User'
 
-    return temp
+    if (p & Privileges.AdminChatMod) > 0:
+        text = 'Chat mod'
+        staff = 1
+
+    if (p & Privileges.AdminBanUsers) > 0:
+        text = 'Community Manager'
+        staff = 2
+
+    if (p & Privileges.AdminManagePrivileges) > 0:
+        text = 'Developer'
+        staff = 2
+
+    if (p & Privileges.UserPublic) == 0:
+        text = 'Restricted'
+
+    return text, staff
 
 
 @app.route('/oauth/ripple/logout/')
@@ -131,11 +141,13 @@ def index():
 
 @app.route('/home/')
 def home():
+    if not is_login():
+        return redirect(url_for('index'))
 
     u = get_user()
-    p = get_privileges(u['privileges'])
+    p, staff = get_privileges(u['privileges'])
 
-    return render_template('home.html', p=p, p1=u['privileges'])
+    return render_template('home.html', user=get_user(), p=p, staff=staff)
 
 
 @app.errorhandler(404)
