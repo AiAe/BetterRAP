@@ -3,16 +3,14 @@
 {% block body %}
 <div class="card text-black bg-light">
     <div class="card-body">
-        <form lpformnum="1" _lpchecked="1">
+        <form lpformnum="1" _lpchecked="1" role="form" method="post"
+              action="{{ url_for('request_namechange') }}"
+              accept-charset="UTF-8">
             <fieldset>
                 <legend>Request username change</legend>
                 <div class="form-group">
                     <label>What username do you want to change with:</label>
-                    <input type="text" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Why do you want to change (2-4 sentences):</label>
-                    <textarea class="form-control" rows="3"></textarea>
+                    <input type="text" name="username" class="form-control">
                 </div>
                 <input type="submit" class="btn btn-primary" value="Send">
             </fieldset>
