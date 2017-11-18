@@ -2,7 +2,7 @@ from flask import Flask, make_response, redirect, request, render_template, url_
 import requests
 import datetime
 import json
-from helpers import mysql
+from helpers import mysql, Privileges
 
 with open("config.json", "r") as f:
     config = json.load(f)
@@ -39,9 +39,18 @@ def ripple_aouth():
     red.set_cookie('ACCESS_TOKEN', ripple_token['access_token'], expires=expire_date)
 
     connection, cursor = mysql.connect()
-    mysql.execute(connection, cursor,
-                  "INSERT INTO users (user_id, username, privileges, access_token) VALUES (%s, %s, %s, %s)",
-                  [user['id'], user['username'], user['privileges'], ripple_token['access_token']])
+
+    try:
+        mysql.execute(connection, cursor,
+                      "INSERT INTO users (user_id, username, privileges, access_token) VALUES (%s, %s, %s, %s)",
+                      [user['id'], user['username'], user['privileges'],
+                       ripple_token['access_token']])
+    except:
+        mysql.execute(connection, cursor,
+                      "UPDATE users SET access_token = %s WHERE user_id = %s",
+                      [ripple_token['access_token'], user['id']])
+
+        return 'User in db...'
 
     return red
 
@@ -53,6 +62,36 @@ def is_login():
         return True
 
     return False
+
+
+def get_user():
+    connection, cursor = mysql.connect()
+
+    ACCESS_TOKEN = request.cookies.get('ACCESS_TOKEN')
+
+    if ACCESS_TOKEN:
+        user = mysql.execute(connection, cursor,
+                             "SELECT * FROM users WHERE access_token = %s",
+                             [ACCESS_TOKEN]).fetchone()
+
+        return user
+    else:
+        return 'ERROR'
+
+
+def get_privileges(p):
+    temp = ''
+
+    if (p & Privileges.UserNormal) > 0:
+        temp = 'User'
+    if (p & Privileges.AdminChatMod) > 0:
+        temp = 'Chat mod'
+    if (p & Privileges.AdminBanUsers) > 0:
+        temp = 'Community Manager'
+    if (p & Privileges.AdminManagePrivileges) > 0:
+        temp = 'Developer'
+
+    return temp
 
 
 @app.route('/oauth/ripple/logout/')
@@ -67,7 +106,8 @@ def ripple_logout():
                       headers=headers).json()
 
         connection, cursor = mysql.connect()
-        mysql.execute(connection, cursor, "DELETE from users WHERE access_token = %s", [ACCESS_TOKEN])
+        mysql.execute(connection, cursor, "DELETE from users WHERE access_token = %s",
+                      [ACCESS_TOKEN])
 
         red = make_response(redirect(url_for('index')))
         red.set_cookie('ACCESS_TOKEN', '', expires=0)
@@ -91,7 +131,11 @@ def index():
 
 @app.route('/home/')
 def home():
-    return render_template('home.html')
+
+    u = get_user()
+    p = get_privileges(u['privileges'])
+
+    return render_template('home.html', p=p, p1=u['privileges'])
 
 
 @app.errorhandler(404)
