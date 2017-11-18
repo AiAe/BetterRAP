@@ -24,22 +24,24 @@
         <div class="collapse navbar-collapse" id="navbarColor01">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Home</a>
+                    <a class="nav-link" href="{{ url_for('home') }}">Home</a>
                 </li>
-                {% if staff == 0 %}
+                {% if perm == 1 %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Request name change</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Ban Appeal</a>
+                    <a class="nav-link" href="{{ url_for('request_namechange') }}">Request name change</a>
                 </li>
                 {% endif %}
-                {% if staff > 0 %}
+                {% if perm == 0 %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('request_banappeal') }}">Ban Appeal</a>
+                </li>
+                {% endif %}
+                {% if perm > 2 %}
                 <li class="nav-item">
                     <a class="nav-link" href="#">Manage name changes</a>
                 </li>
                 {% endif %}
-                {% if staff > 1 %}
+                {% if perm > 2 %}
                 <li class="nav-item">
                     <a class="nav-link" href="#">Manage appeals</a>
                 </li>
@@ -56,6 +58,7 @@
         </div>
     </div>
 </nav>
+<br>
 <div class="container">
     {% block body %}
     {% endblock %}
