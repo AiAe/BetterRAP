@@ -78,30 +78,37 @@ def get_user():
     else:
         return 'ERROR'
 
+def api_user_privileges(user_id):
+
+    user = requests.get('https://ripple.moe/api/v1/users', params={'id': user_id}).json()
+
+    return user['privileges']
 
 def get_privileges(p):
     text = ''
-    staff = 0
+    perm = 0
 
     if (p & Privileges.UserNormal) > 0:
         text = 'User'
+        perm = 1
 
     if (p & Privileges.AdminChatMod) > 0:
         text = 'Chat mod'
-        staff = 1
+        perm = 2
 
     if (p & Privileges.AdminBanUsers) > 0:
         text = 'Community Manager'
-        staff = 2
+        perm = 3
 
     if (p & Privileges.AdminManagePrivileges) > 0:
         text = 'Developer'
-        staff = 2
+        perm = 4
 
     if (p & Privileges.UserPublic) == 0:
         text = 'Restricted'
+        perm = 1
 
-    return text, staff
+    return text, perm
 
 
 @app.route('/oauth/ripple/logout/')
@@ -145,9 +152,31 @@ def home():
         return redirect(url_for('index'))
 
     u = get_user()
-    p, staff = get_privileges(u['privileges'])
+    p, perm = get_privileges(api_user_privileges(u['user_id']))
 
-    return render_template('home.html', user=get_user(), p=p, staff=staff)
+    return render_template('home.html', user=get_user(), p=p, perm=perm)
+
+
+@app.route('/banappeal/')
+def request_banappeal():
+    if not is_login():
+        return redirect(url_for('index'))
+
+    u = get_user()
+    p, perm = get_privileges(api_user_privileges(u['user_id']))
+
+    return render_template('banappeal.html', user=get_user(), p=p, perm=perm)
+
+
+@app.route('/namechange/')
+def request_namechange():
+    if not is_login():
+        return redirect(url_for('index'))
+
+    u = get_user()
+    p, perm = get_privileges(api_user_privileges(u['user_id']))
+
+    return render_template('namechange.html', user=get_user(), p=p, perm=perm)
 
 
 @app.errorhandler(404)
