@@ -1,16 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title></title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="author" content="Daniel Dimitrov">
-<link type="text/css" rel="stylesheet" href="/static/bootstrap.min.css">
-<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-<link rel="shortcut icon" href="/static/aiae.ico" />
-</head>
-<body>
-
-</body>
-</html>
+{% extends 'layout1.html' %}
+{% block title %} Login {% endblock %}
+{% block body %}
+<div class="logincenter">
+    <img src="{{ url_for('static', filename='img/eggplant.png') }}">
+    <div class="card text-white bg-primary">
+        <div class="card-body">
+            <a href="https://ripple.moe/oauth/authorize?response_type=code&client_id={{ client_id }}&redirect_url={{ redirect_url }}" class="btn btn-primary btn-lg btn-block">Login with
+                Ripple
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
