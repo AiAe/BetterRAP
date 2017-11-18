@@ -220,8 +220,10 @@ def manage_usernamechanges():
     u = get_user()
     p, perm = get_privileges(api_user_privileges(u['user_id']))
 
+    connection, cursor = mysql.connect()
+    get_requests = mysql.execute(connection, cursor, "SELECT * FROM requests WHERE category = 1").fetchall()
     return render_template('manageusernamechanges.html', user=api_user_username(u['user_id']),
-                           p=p, perm=perm)
+                           p=p, perm=perm, r=get_requests)
 
 @app.route('/manage/banappeals/')
 def manage_banappeals():
