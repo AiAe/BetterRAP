@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+{% block title %} Ban appeal {% endblock %}
+{% block body %}
+<div class="alert alert-dismissible alert-danger">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    It has not been one month since your restriction.<br>
+    Therefore you'll have to wait a bit longer before you can appeal.<br>
+    Your appeal date is: <strong>12/12/2020</strong>.<br>
+    But if you think your ban was wrong you can send appeal.
+</div>
+<div class="card text-black bg-light">
+    <div class="card-body">
+        <form lpformnum="1" _lpchecked="1">
+            <fieldset>
+                <legend>To start the ban appeal process, you will have to answer the
+                    following questions truthfully.
+                    <br>
+                    Please note that any lies or dishonesty will result in immediate
+                    denial of your appeal.
+                </legend>
+                <div class="form-group">
+                    <label>List <b>any and all</b> other accounts you have used or created:</label>
+                    <textarea class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Is this your <b>first</b> time being restricted:</label>
+                    <textarea class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>If this <b>isn't</b> your first time being restricted, why were you restricted in the past:</label>
+                    <textarea class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Let us know what caused your most <b>recent</b> restriction/ban:</label>
+                    <textarea class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Why should we allow you back into Ripple? (3-6 sentences):</label>
+                    <textarea class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Write a <b>1-2 paragraphs</b> (6-12 sentences) about how if we let you back into Ripple, you won't break anymore rules:</label>
+                    <textarea class="form-control" rows="3"></textarea>
+                </div>
+                <input type="submit" class="btn btn-primary" value="Send">
+            </fieldset>
+        </form>
+    </div>
+</div>
+{% endblock %}
