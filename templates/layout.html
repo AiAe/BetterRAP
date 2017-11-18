@@ -26,11 +26,28 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#">Home</a>
                 </li>
+                {% if staff == 0 %}
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Request name change</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Ban Appeal</a>
+                </li>
+                {% endif %}
+                {% if staff > 0 %}
                 <li class="nav-item">
                     <a class="nav-link" href="#">Manage name changes</a>
                 </li>
+                {% endif %}
+                {% if staff > 1 %}
                 <li class="nav-item">
                     <a class="nav-link" href="#">Manage appeals</a>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="nav navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Welcome {{ user.username }} <span class="badge badge-primary">{{ p }}</span></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('ripple_logout') }}">Logout</a>
