@@ -10,7 +10,12 @@ app.secret_key = ''
 @app.route('/')
 def index():
 
-    return ''
+    return render_template('login.html')
+
+@app.route('/home/')
+def home():
+
+    return render_template('home.html')
 
 @app.errorhandler(404)
 def not_found(error):
