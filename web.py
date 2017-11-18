@@ -10,13 +10,13 @@ with open("config.json", "r") as f:
 app = Flask(__name__)
 app.secret_key = ''
 
+
 @app.route('/oauth/ripple/')
 def ripple_aouth():
     with open("ripple.json", "r") as f:
         ripple_config = json.load(f)
 
     if not request.args:
-
         return 'I love hackers'
 
     data = {
@@ -37,23 +37,23 @@ def ripple_aouth():
 
     red = make_response(redirect('/'))
     red.set_cookie('ACCESS_TOKEN', ripple_token['access_token'], expires=expire_date)
-    #red.set_cookie('USERID', str(user['id']), expires=expire_date)
-    #red.set_cookie('USERNAME', user['username'], expires=expire_date)
-    #red.set_cookie('PRIVILEGES', str(user['privileges']), expires=expire_date)
+
+    connection, cursor = mysql.connect()
+    mysql.execute(connection, cursor,
+                  "INSERT INTO users (user_id, username, privileges, access_token) VALUES (%s, %s, %s, %s)",
+                  [user['id'], user['username'], user['privileges'], ripple_token['access_token']])
 
     return red
 
+
 def is_login():
     ACCESS_TOKEN = request.cookies.get('ACCESS_TOKEN')
-    USERID = request.cookies.get('USERID')
-    USERNAME = request.cookies.get('USERNAME')
-    PRIVILEGES = request.cookies.get('PRIVILEGES')
 
-    if all(v is not None for v in [ACCESS_TOKEN, USERID, USERNAME, PRIVILEGES]):
-
+    if ACCESS_TOKEN:
         return True
 
     return False
+
 
 @app.route('/oauth/ripple/logout/')
 def ripple_logout():
@@ -63,19 +63,19 @@ def ripple_logout():
 
         headers = {'Authorization': 'Bearer ' + ACCESS_TOKEN}
 
-        requests.post('https://ripple.moe/api/v1/tokens/self/delete', headers=headers).json()
+        requests.post('https://ripple.moe/api/v1/tokens/self/delete',
+                      headers=headers).json()
+
+        connection, cursor = mysql.connect()
+        mysql.execute(connection, cursor, "DELETE from users WHERE access_token = %s", [ACCESS_TOKEN])
 
         red = make_response(redirect(url_for('index')))
-
         red.set_cookie('ACCESS_TOKEN', '', expires=0)
-        red.set_cookie('USERID', '', expires=0)
-        red.set_cookie('USERNAME', '', expires=0)
-        red.set_cookie('PRIVILEGES', '', expires=0)
-
         return red
     else:
 
         return 'Gotta love hackers...'
+
 
 @app.route('/')
 def index():
@@ -83,15 +83,16 @@ def index():
         ripple_config = json.load(f)
 
     if is_login():
-
         return redirect(url_for('home'))
 
-    return render_template('login.html', client_id=ripple_config['client_id'], redirect_url=ripple_config['redirect_url'])
+    return render_template('login.html', client_id=ripple_config['client_id'],
+                           redirect_url=ripple_config['redirect_url'])
+
 
 @app.route('/home/')
 def home():
-
     return render_template('home.html')
+
 
 @app.errorhandler(404)
 def not_found(error):
