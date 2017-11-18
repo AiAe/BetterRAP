@@ -28,28 +28,31 @@
                 </li>
                 {% if perm == 1 %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('request_namechange') }}">Request name change</a>
+                    <a class="nav-link" href="{{ url_for('request_namechange') }}">Request
+                        name change</a>
                 </li>
                 {% endif %}
                 {% if perm == 0 %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('request_banappeal') }}">Ban Appeal</a>
+                    <a class="nav-link" href="{{ url_for('request_banappeal') }}">Ban
+                        Appeal</a>
                 </li>
                 {% endif %}
                 {% if perm > 2 %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Manage name changes</a>
+                    <a class="nav-link" href="{{ url_for('manage_usernamechanges') }}">Manage name changes</a>
                 </li>
                 {% endif %}
                 {% if perm > 2 %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Manage appeals</a>
+                    <a class="nav-link" href="{{ url_for('manage_banappeals') }}">Manage appeals</a>
                 </li>
                 {% endif %}
             </ul>
             <ul class="nav navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Welcome {{ user.username }} <span class="badge badge-primary">{{ p }}</span></a>
+                    <a class="nav-link" href="#">Welcome {{ user }} <span
+                            class="badge badge-primary">{{ p }}</span></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('ripple_logout') }}">Logout</a>
@@ -60,6 +63,20 @@
 </nav>
 <br>
 <div class="container">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="container">
+        <div class="flash-error">
+            <div class="alert alert-dismissible alert-warning">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {% for message in messages %}
+                {{ message }} <br>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
     {% block body %}
     {% endblock %}
 </div>
