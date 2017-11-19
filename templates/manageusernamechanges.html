@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block title %} Dashboard {% endblock %}
+{% block title %} Dashboard name changes {% endblock %}
 {% block body %}
 <div class="card text-black bg-light">
     <div class="card-body">
@@ -30,7 +30,7 @@
                 </td>
                 <td>{{ request.date }}</td>
                 <td>
-                    <a href="" type="button" class="btn btn-success">Approve</a>
+                    <a href="{{ url_for('api_user_edit', user_id = request.user_id, username = request.new_username) }}" type="button" class="btn btn-success">Approve</a>
                     <a href="" type="button" class="btn btn-danger">Deny</a>
                 </td>
             </tr>
