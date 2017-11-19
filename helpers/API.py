@@ -1,6 +1,7 @@
 import requests
 from helpers import mysql, Privileges
 from flask import request
+from datetime import datetime
 
 def get_user():
     connection, cursor = mysql.connect()
@@ -72,3 +73,15 @@ def is_login(check_for_admin=False):
         return True
 
     return False
+
+def logging(username, user_id, text):
+    connection, cursor = mysql.connect()
+
+    mysql.execute(connection, cursor,
+                  "INSERT INTO logs (username, user_id, text, date) VALUES (%s, %s, %s, %s)",
+                  [username, user_id, text,
+                   datetime.now().strftime('%d.%m.%Y %H:%M')])
+
+def user_edit(params, json_data):
+    return requests.post('https://ripple.moe/api/v1/users/edit', params=params,
+                  json=json_data).json()
