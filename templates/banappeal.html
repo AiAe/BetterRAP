@@ -10,7 +10,9 @@
 </div>
 <div class="card text-black bg-light">
     <div class="card-body">
-        <form lpformnum="1" _lpchecked="1">
+        <form lpformnum="1" _lpchecked="1" role="form" method="post"
+              action="{{ url_for('request_banappeal') }}"
+              accept-charset="UTF-8">
             <fieldset>
                 <legend>To start the ban appeal process, you will have to answer the
                     following questions truthfully.
