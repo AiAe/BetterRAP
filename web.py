@@ -2,7 +2,7 @@ from flask import Flask, make_response, redirect, request, render_template, url_
 import requests
 from datetime import datetime
 import json
-from helpers import mysql, Privileges
+from helpers import mysql, API
 
 with open("config.json", "r") as f:
     config = json.load(f)
@@ -54,120 +54,9 @@ def ripple_aouth():
 
     return red
 
-
-def get_user():
-    connection, cursor = mysql.connect()
-
-    ACCESS_TOKEN = request.cookies.get('ACCESS_TOKEN')
-
-    if ACCESS_TOKEN:
-        user = mysql.execute(connection, cursor,
-                             "SELECT * FROM users WHERE access_token = %s",
-                             [ACCESS_TOKEN]).fetchone()
-
-        return user
-    else:
-        return 'ERROR'
-
-
-def api_user_username(user_id):
-    user = requests.get('https://ripple.moe/api/v1/users', params={'id': user_id}).json()
-
-    return user['username']
-
-
-def api_user_privileges(user_id):
-    user = requests.get('https://ripple.moe/api/v1/users', params={'id': user_id}).json()
-
-    return user['privileges']
-
-
-@app.route('/request/')
-def api_user_edit():
-    if not request.args:
-        return 'I love hackers'
-
-    with open("ripple.json", "r") as f:
-        ripple_config = json.load(f)
-
-    params = {
-        'token': ripple_config['token'],
-    }
-
-    json_data = {
-        'id': int(request.args['user_id']),
-        'username': str(request.args['username'])
-    }
-
-    user = requests.post('https://ripple.moe/api/v1/users/edit', params=params, json=json_data).json()
-    u = get_user()
-    username = api_user_username(u['user_id'])
-    connection, cursor = mysql.connect()
-
-    text = 'Changed username from {} to {}'.format(user["username"],
-                                                   request.args['username'])
-
-    mysql.execute(connection, cursor,
-                  "INSERT INTO logs (username, user_id, text, date) VALUES (%s, %s, %s, %s)",
-                  [username, u["user_id"], text, datetime.now().strftime('%d.%m.%Y %H:%M')])
-
-    mysql.execute(connection, cursor, "DELETE from requests WHERE new_username = %s",
-                  [request.args['username']])
-
-    flash('Changed username from {} to {}.'.format(user["username"],
-                                                   request.args['username']))
-    return redirect(url_for('manage_usernamechanges'))
-
-
-def get_privileges(p):
-    text = ''
-    perm = 0
-
-    if (p & Privileges.UserNormal) > 0:
-        text = 'User'
-        perm = 1
-
-    if (p & Privileges.AdminChatMod) > 0:
-        text = 'Chat mod'
-        perm = 2
-
-    if (p & Privileges.AdminBanUsers) > 0:
-        text = 'Community Manager'
-        perm = 3
-
-    if (p & Privileges.AdminManagePrivileges) > 0:
-        text = 'Developer'
-        perm = 3
-
-    if (p & Privileges.UserPublic) == 0:
-        text = 'Restricted'
-        perm = 1
-
-    return text, perm
-
-
-def is_login(check_for_admin=False):
-    ACCESS_TOKEN = request.cookies.get('ACCESS_TOKEN')
-
-    if check_for_admin:
-        user = get_user()
-
-        p, perm = get_privileges(api_user_privileges(user['user_id']))
-
-        if perm >= 3:
-            return True
-
-        return False
-
-    if ACCESS_TOKEN:
-        return True
-
-    return False
-
-
 @app.route('/oauth/ripple/logout/')
 def ripple_logout():
-    if is_login():
+    if API.is_login():
 
         ACCESS_TOKEN = request.cookies.get('ACCESS_TOKEN')
 
@@ -193,7 +82,7 @@ def index():
     with open("ripple.json", "r") as f:
         ripple_config = json.load(f)
 
-    if is_login():
+    if API.is_login():
         return redirect(url_for('home'))
 
     return render_template('login.html', client_id=ripple_config['client_id'],
@@ -202,23 +91,59 @@ def index():
 
 @app.route('/home/')
 def home():
-    if not is_login():
+    if not API.is_login():
         return redirect(url_for('index'))
 
-    u = get_user()
-    p, perm = get_privileges(api_user_privileges(u['user_id']))
+    u = API.get_user()
+    p, perm = API.get_privileges()
 
-    return render_template('home.html', user=api_user_username(u['user_id']), p=p,
+    return render_template('home.html', user=API.api_user_username(u['user_id']), p=p,
                            perm=perm)
 
 
+@app.route('/request/')
+def api_user_edit():
+    if not request.args:
+        return 'I love hackers'
+
+    with open("ripple.json", "r") as f:
+        ripple_config = json.load(f)
+
+    params = {
+        'token': ripple_config['token'],
+    }
+
+    json_data = {
+        'id': int(request.args['user_id']),
+        'username': str(request.args['username'])
+    }
+
+    user = requests.post('https://ripple.moe/api/v1/users/edit', params=params, json=json_data).json()
+    u = API.get_user()
+    username = API.api_user_username(u['user_id'])
+    connection, cursor = mysql.connect()
+
+    text = 'Changed username from {} to {}'.format(user["username"],
+                                                   request.args['username'])
+
+    mysql.execute(connection, cursor,
+                  "INSERT INTO logs (username, user_id, text, date) VALUES (%s, %s, %s, %s)",
+                  [username, u["user_id"], text, datetime.now().strftime('%d.%m.%Y %H:%M')])
+
+    mysql.execute(connection, cursor, "DELETE from requests WHERE new_username = %s",
+                  [request.args['username']])
+
+    flash('Changed username from {} to {}.'.format(user["username"],
+                                                   request.args['username']))
+    return redirect(url_for('manage_usernamechanges'))
+
 @app.route('/banappeal/', methods=['GET', 'POST'])
 def request_banappeal():
-    if not is_login():
+    if not API.is_login():
         return redirect(url_for('index'))
 
-    u = get_user()
-    p, perm = get_privileges(api_user_privileges(u['user_id']))
+    u = API.get_user()
+    p, perm = API.get_privileges()
 
     if request.method == 'POST':
 
@@ -245,7 +170,7 @@ def request_banappeal():
             try:
                 mysql.execute(connection, cursor,
                               "INSERT INTO requests (user_id, username, category, text, date) VALUES (%s, %s, %s, %s, %s)",
-                              [u['user_id'], api_user_username(u['user_id']), 2, text,
+                              [u['user_id'], API.api_user_username(u['user_id']), 2, text,
                                        datetime.now().strftime('%d.%m.%Y %H:%M')])
 
                 flash('Thanks for appealing, it can take up to 7 days for us to review.')
@@ -254,17 +179,17 @@ def request_banappeal():
 
                 flash("I see you really want to get unrestricted, don't we will review your appeal soon.")
 
-    return render_template('banappeal.html', user=api_user_username(u['user_id']), p=p,
+    return render_template('banappeal.html', user=API.api_user_username(u['user_id']), p=p,
                            perm=perm)
 
 
 @app.route('/namechange/', methods=['GET', 'POST'])
 def request_namechange():
-    if not is_login():
+    if not API.is_login():
         return redirect(url_for('index'))
 
-    u = get_user()
-    p, perm = get_privileges(api_user_privileges(u['user_id']))
+    u = API.get_user()
+    p, perm = API.get_privileges()
 
     if request.method == 'POST':
 
@@ -278,62 +203,62 @@ def request_namechange():
             try:
                 mysql.execute(connection, cursor,
                               "INSERT INTO requests (user_id, username, category, used, new_username, date) VALUES (%s, %s, %s, %s, %s, %s)",
-                              [u['user_id'], api_user_username(u['user_id']), 1, 0,
+                              [u['user_id'], API.api_user_username(u['user_id']), 1, 0,
                                username,
                                datetime.now().strftime('%d.%m.%Y %H:%M')])
                 flash('Your request is added to pending.')
             except:
                 flash('You have still pending username change!')
 
-    return render_template('namechange.html', user=api_user_username(u['user_id']),
+    return render_template('namechange.html', user=API.api_user_username(u['user_id']),
                            p=p, perm=perm)
 
 
 @app.route('/manage/usernamechanges/')
 def manage_usernamechanges():
-    if not is_login(check_for_admin=True):
+    if not API.is_login(check_for_admin=True):
         return redirect(url_for('index'))
 
-    u = get_user()
-    p, perm = get_privileges(api_user_privileges(u['user_id']))
+    u = API.get_user()
+    p, perm = API.get_privileges()
 
     connection, cursor = mysql.connect()
     get_requests = mysql.execute(connection, cursor,
                                  "SELECT * FROM requests WHERE category = 1").fetchall()
     return render_template('manageusernamechanges.html',
-                           user=api_user_username(u['user_id']),
+                           user=API.api_user_username(u['user_id']),
                            p=p, perm=perm, r=get_requests)
 
 
 @app.route('/manage/banappeals/')
 def manage_banappeals():
-    if not is_login(check_for_admin=True):
+    if not API.is_login(check_for_admin=True):
         return redirect(url_for('index'))
 
-    u = get_user()
-    p, perm = get_privileges(api_user_privileges(u['user_id']))
+    u = API.get_user()
+    p, perm = API.get_privileges()
 
     connection, cursor = mysql.connect()
     get_requests = mysql.execute(connection, cursor,
                                  "SELECT * FROM requests WHERE category = 2").fetchall()
     return render_template('managebanappeals.html',
-                           user=api_user_username(u['user_id']),
+                           user=API.api_user_username(u['user_id']),
                            p=p, perm=perm, r=get_requests)
 
 
 @app.route('/logs/')
 def logs():
-    if not is_login(check_for_admin=True):
+    if not API.is_login(check_for_admin=True):
         return redirect(url_for('index'))
 
-    u = get_user()
-    p, perm = get_privileges(api_user_privileges(u['user_id']))
+    u = API.get_user()
+    p, perm = API.get_privileges()
 
     connection, cursor = mysql.connect()
     get_requests = mysql.execute(connection, cursor,
-                                 "SELECT username, text, date FROM logs").fetchall()
+                                 "SELECT username, text, date FROM logs ORDER BY id desc").fetchall()
     return render_template('logs.html',
-                           user=api_user_username(u['user_id']),
+                           user=API.api_user_username(u['user_id']),
                            p=p, perm=perm, r=get_requests)
 
 
