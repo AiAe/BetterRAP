@@ -82,6 +82,47 @@ def api_user_privileges(user_id):
     return user['privileges']
 
 
+@app.route('/request/')
+def api_user_edit():
+    if not request.args:
+        return 'I love hackers'
+
+    with open("ripple.json", "r") as f:
+        ripple_config = json.load(f)
+
+    params = {
+        'token': ripple_config['token'],
+    }
+
+    json_data = {
+        'id': int(request.args['user_id']),
+        'username': str(request.args['username'])
+    }
+
+    # user = requests.post('https://ripple.moe/api/v1/users/edit', params=params, json=json_data).json()
+    # print(user)
+    user = {'code': 200, 'id': 43625, 'username': 'GottaLoveHowl', 'username_aka': '',
+            'registered_on': '2017-09-13T23:00:39+02:00', 'privileges': 2097155,
+            'latest_activity': '2017-11-19T02:47:28+01:00', 'country': 'HM'}
+    u = get_user()
+    username = api_user_username(u['user_id'])
+    connection, cursor = mysql.connect()
+
+    text = 'Changed username from {} to {}'.format(user["username"],
+                                                   request.args['username'])
+
+    mysql.execute(connection, cursor,
+                  "INSERT INTO logs (username, user_id, text) VALUES (%s, %s, %s)",
+                  [username, u["user_id"], text])
+
+    mysql.execute(connection, cursor, "DELETE from requests WHERE new_username = %s",
+                  [request.args['username']])
+
+    flash('Changed username from {} to {}.'.format(user["username"],
+                                                   request.args['username']))
+    return redirect(url_for('manage_usernamechanges'))
+
+
 def get_privileges(p):
     text = ''
     perm = 0
@@ -100,7 +141,7 @@ def get_privileges(p):
 
     if (p & Privileges.AdminManagePrivileges) > 0:
         text = 'Developer'
-        perm = 4
+        perm = 3
 
     if (p & Privileges.UserPublic) == 0:
         text = 'Restricted'
@@ -108,20 +149,25 @@ def get_privileges(p):
 
     return text, perm
 
-def is_login(check_for_admin = False):
+
+def is_login(check_for_admin=False):
     ACCESS_TOKEN = request.cookies.get('ACCESS_TOKEN')
 
     if check_for_admin:
-        p, perm = get_privileges(api_user_privileges())
+        user = get_user()
 
+        p, perm = get_privileges(api_user_privileges(user['user_id']))
 
+        if perm >= 3:
+            return True
 
-        return ''
+        return False
 
     if ACCESS_TOKEN:
         return True
 
     return False
+
 
 @app.route('/oauth/ripple/logout/')
 def ripple_logout():
@@ -178,6 +224,40 @@ def request_banappeal():
     u = get_user()
     p, perm = get_privileges(api_user_privileges(u['user_id']))
 
+    if request.method == 'POST':
+
+        q1 = request.form['q1']
+        q2 = request.form['q2']
+        q3 = request.form['q3']
+        q4 = request.form['q4']
+        q5 = request.form['q5']
+        q6 = request.form['q6']
+
+        if all([q1, q2, q3, q4, q5, q6]) == False:
+            flash('Please fill everything!')
+        else:
+            text = "List any and all other accounts you have used or created: {}\n" \
+                   "Is this your first time being restricted: {}\n" \
+                   "If this isn't your first time being restricted, why were you restricted in the past: {}\n" \
+                   "Let us know what caused your most recent restriction/ban: {}\n" \
+                   "Why should we allow you back into Ripple? (3-6 sentences): {}\n" \
+                   "Write a 1-2 paragraphs (6-12 sentences) about how if we let you back into Ripple, you won't break anymore rules: {}".format(
+                q1, q2, q3, q4, q5, q6)
+
+            connection, cursor = mysql.connect()
+
+            try:
+                mysql.execute(connection, cursor,
+                              "INSERT INTO requests (user_id, username, category, text, date) VALUES (%s, %s, %s, %s, %s)",
+                              [u['user_id'], api_user_username(u['user_id']), 2, text,
+                                       datetime.now().strftime('%d.%m.%Y %H:%M')])
+
+                flash('Thanks for appealing, it can take up to 7 days for us to review.')
+
+            except:
+
+                flash("I see you really want to get unrestricted, don't we will review your appeal soon.")
+
     return render_template('banappeal.html', user=api_user_username(u['user_id']), p=p,
                            perm=perm)
 
@@ -202,7 +282,8 @@ def request_namechange():
             try:
                 mysql.execute(connection, cursor,
                               "INSERT INTO requests (user_id, username, category, used, new_username, date) VALUES (%s, %s, %s, %s, %s, %s)",
-                              [u['user_id'], api_user_username(u['user_id']), 1, 0, username,
+                              [u['user_id'], api_user_username(u['user_id']), 1, 0,
+                               username,
                                datetime.now().strftime('%d.%m.%Y %H:%M')])
                 flash('Your request is added to pending.')
             except:
@@ -211,31 +292,54 @@ def request_namechange():
     return render_template('namechange.html', user=api_user_username(u['user_id']),
                            p=p, perm=perm)
 
+
 @app.route('/manage/usernamechanges/')
 def manage_usernamechanges():
-
-    if not is_login():
+    if not is_login(check_for_admin=True):
         return redirect(url_for('index'))
 
     u = get_user()
     p, perm = get_privileges(api_user_privileges(u['user_id']))
 
     connection, cursor = mysql.connect()
-    get_requests = mysql.execute(connection, cursor, "SELECT * FROM requests WHERE category = 1").fetchall()
-    return render_template('manageusernamechanges.html', user=api_user_username(u['user_id']),
+    get_requests = mysql.execute(connection, cursor,
+                                 "SELECT * FROM requests WHERE category = 1").fetchall()
+    return render_template('manageusernamechanges.html',
+                           user=api_user_username(u['user_id']),
                            p=p, perm=perm, r=get_requests)
+
 
 @app.route('/manage/banappeals/')
 def manage_banappeals():
-
-    if not is_login():
+    if not is_login(check_for_admin=True):
         return redirect(url_for('index'))
 
     u = get_user()
     p, perm = get_privileges(api_user_privileges(u['user_id']))
 
-    return render_template('managebanappeals.html', user=api_user_username(u['user_id']),
-                           p=p, perm=perm)
+    connection, cursor = mysql.connect()
+    get_requests = mysql.execute(connection, cursor,
+                                 "SELECT * FROM requests WHERE category = 2").fetchall()
+    return render_template('managebanappeals.html',
+                           user=api_user_username(u['user_id']),
+                           p=p, perm=perm, r=get_requests)
+
+
+@app.route('/logs/')
+def logs():
+    if not is_login(check_for_admin=True):
+        return redirect(url_for('index'))
+
+    u = get_user()
+    p, perm = get_privileges(api_user_privileges(u['user_id']))
+
+    connection, cursor = mysql.connect()
+    get_requests = mysql.execute(connection, cursor,
+                                 "SELECT username, text, date FROM logs").fetchall()
+    return render_template('logs.html',
+                           user=api_user_username(u['user_id']),
+                           p=p, perm=perm, r=get_requests)
+
 
 @app.errorhandler(404)
 def not_found(error):
