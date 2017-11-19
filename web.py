@@ -99,11 +99,7 @@ def api_user_edit():
         'username': str(request.args['username'])
     }
 
-    # user = requests.post('https://ripple.moe/api/v1/users/edit', params=params, json=json_data).json()
-    # print(user)
-    user = {'code': 200, 'id': 43625, 'username': 'GottaLoveHowl', 'username_aka': '',
-            'registered_on': '2017-09-13T23:00:39+02:00', 'privileges': 2097155,
-            'latest_activity': '2017-11-19T02:47:28+01:00', 'country': 'HM'}
+    user = requests.post('https://ripple.moe/api/v1/users/edit', params=params, json=json_data).json()
     u = get_user()
     username = api_user_username(u['user_id'])
     connection, cursor = mysql.connect()
@@ -112,8 +108,8 @@ def api_user_edit():
                                                    request.args['username'])
 
     mysql.execute(connection, cursor,
-                  "INSERT INTO logs (username, user_id, text) VALUES (%s, %s, %s)",
-                  [username, u["user_id"], text])
+                  "INSERT INTO logs (username, user_id, text, date) VALUES (%s, %s, %s, %s)",
+                  [username, u["user_id"], text, datetime.now().strftime('%d.%m.%Y %H:%M')])
 
     mysql.execute(connection, cursor, "DELETE from requests WHERE new_username = %s",
                   [request.args['username']])
