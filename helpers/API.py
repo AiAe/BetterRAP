@@ -70,19 +70,20 @@ def user_privilege():
 
     return badge
 
-def is_chatmod():
-    text, perm = user_privilege()
 
-    if perm >= 2:
+def is_chatmod():
+    p = user_privilege()
+
+    if p['perm'] >= 2:
         return True
 
     return False
 
 
 def is_admin():
-    text, perm = user_privilege()
+    p = user_privilege()
 
-    if perm >= 3:
+    if p['perm'] >= 3:
         return True
 
     return False
