@@ -9,16 +9,19 @@ from helpers import mysql, API
 with open("config.json", "r") as f:
     config = json.load(f)
 
+with open("email.json", "r") as f:
+    config_email = json.load(f)
+
 app = Flask(__name__)
 app.secret_key = 'betterrapisawesome'
 
-app.config['MAIL_SERVER'] = "smtp.gmail.com"
-app.config['MAIL_PORT'] = "465"
-app.config['MAIL_USERNAME'] = ""
-app.config['MAIL_PASSWORD'] = ""
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_DEFAULT_SENDER'] = ""
+app.config['MAIL_SERVER'] = config_email['MAIL_SERVER']
+app.config['MAIL_PORT'] = "7337"
+app.config['MAIL_USERNAME'] = config_email['MAIL_USERNAME']
+app.config['MAIL_PASSWORD'] = config_email['MAIL_PASSWORD']
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_DEFAULT_SENDER'] = config_email['MAIL_USERNAME']
 app.config['MAIL_DEBUG'] = True
 
 mail = Mail()
@@ -27,7 +30,7 @@ mail.init_app(app)
 
 def send_email(email, d):
 
-    with open("config.json", "r") as f:
+    with open("drafts.json", "r") as f:
         draft = json.load(f)
 
     if d == 0:
@@ -43,7 +46,10 @@ def send_email(email, d):
     elif d == 5:
         text = draft['deny_username']
 
-    msg = Message('osu!fx Email activation', recipients=email)
+    list = []
+    list.append(email)
+
+    msg = Message('Ripple Support', recipients=list)
     msg.body = text
     mail.send(msg)
 
@@ -152,20 +158,19 @@ def api_user_edit():
         'username': str(request.args['username'])
     }
 
-    user = API.user_edit(params, json_data)
-    u = API.get_user()
+    user = API.api_user_edit(params, json_data)
+    u = API.user_exist()
     username = API.api_user_username(u['user_id'])
     connection, cursor = mysql.connect()
 
-    text = 'Changed username from {} to {}'.format(user["username"],
-                                                   request.args['username'])
+    text = 'Changed username from {} to {}'.format(user["username"],request.args['username'])
 
     API.logging(username, u["user_id"], text)
 
     mysql.execute(connection, cursor, "DELETE from requests WHERE new_username = %s",
                   [request.args['username']])
 
-
+    send_email('bgdppeu@gmail.com', 2)
 
     flash('Changed username from {} to {}.'.format(user["username"],
                                                    request.args['username']))
