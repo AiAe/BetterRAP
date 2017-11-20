@@ -72,7 +72,7 @@ def user_privilege():
 def is_chatmod():
     user_perm = user_exist()['perm']
 
-    if user_perm == 2:
+    if user_perm >= 2:
 
         return True
 
