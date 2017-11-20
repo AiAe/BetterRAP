@@ -1,6 +1,7 @@
 from flask import Flask, make_response, redirect, request, render_template, url_for, flash
 import requests
-from datetime import datetime
+import datetime
+from datetime import datetime as dt
 import json
 from helpers import mysql, API
 
@@ -42,17 +43,15 @@ def ripple_aouth():
 
     try:
         mysql.execute(connection, cursor,
-                      "INSERT INTO users (user_id, username, privileges, access_token) VALUES (%s, %s, %s, %s)",
-                      [user['id'], user['username'], user['privileges'],
-                       ripple_token['access_token']])
+                      "INSERT INTO users (user_id, access_token) VALUES (%s, %s)",
+                      [user['id'], ripple_token['access_token']])
     except:
         mysql.execute(connection, cursor,
                       "UPDATE users SET access_token = %s WHERE user_id = %s",
                       [ripple_token['access_token'], user['id']])
 
-        return 'User in db...'
-
     return red
+
 
 @app.route('/oauth/ripple/logout/')
 def ripple_logout():
@@ -82,7 +81,7 @@ def index():
     with open("ripple.json", "r") as f:
         ripple_config = json.load(f)
 
-    if API.is_login():
+    if API.user_logged_in():
         return redirect(url_for('home'))
 
     return render_template('login.html', client_id=ripple_config['client_id'],
@@ -91,14 +90,13 @@ def index():
 
 @app.route('/home/')
 def home():
-    if not API.is_login():
+    if not API.user_logged_in():
         return redirect(url_for('index'))
 
-    u = API.get_user()
-    p, perm = API.get_privileges()
+    user_id = API.api_user_username(API.user_exist()['user_id'])
+    user_privilege = API.user_privilege()
 
-    return render_template('home.html', user=API.api_user_username(u['user_id']), p=p,
-                           perm=perm)
+    return render_template('home.html', user=user_id, user_privilege=user_privilege)
 
 
 @app.route('/request/')
@@ -135,13 +133,14 @@ def api_user_edit():
                                                    request.args['username']))
     return redirect(url_for('manage_usernamechanges'))
 
+
 @app.route('/banappeal/', methods=['GET', 'POST'])
 def request_banappeal():
-    if not API.is_login():
+    if not API.user_logged_in():
         return redirect(url_for('index'))
 
-    u = API.get_user()
-    p, perm = API.get_privileges()
+    user_id = API.api_user_username(API.user_exist()['user_id'])
+    user_privilege = API.user_privilege()
 
     if request.method == 'POST':
 
@@ -169,7 +168,7 @@ def request_banappeal():
                 mysql.execute(connection, cursor,
                               "INSERT INTO requests (user_id, username, category, text, date) VALUES (%s, %s, %s, %s, %s)",
                               [u['user_id'], API.api_user_username(u['user_id']), 2, text,
-                                       datetime.now().strftime('%d.%m.%Y %H:%M')])
+                               datetime.now().strftime('%d.%m.%Y %H:%M')])
 
                 flash('Thanks for appealing, it can take up to 7 days for us to review.')
 
@@ -177,17 +176,16 @@ def request_banappeal():
 
                 flash("I see you really want to get unrestricted, don't we will review your appeal soon.")
 
-    return render_template('banappeal.html', user=API.api_user_username(u['user_id']), p=p,
-                           perm=perm)
+    return render_template('banappeal.html', user=user_id, user_privilege=user_privilege)
 
 
 @app.route('/namechange/', methods=['GET', 'POST'])
 def request_namechange():
-    if not API.is_login():
+    if not API.user_logged_in():
         return redirect(url_for('index'))
 
-    u = API.get_user()
-    p, perm = API.get_privileges()
+    user_id = API.api_user_username(API.user_exist()['user_id'])
+    user_privilege = API.user_privilege()
 
     if request.method == 'POST':
 
@@ -201,63 +199,56 @@ def request_namechange():
             try:
                 mysql.execute(connection, cursor,
                               "INSERT INTO requests (user_id, username, category, used, new_username, date) VALUES (%s, %s, %s, %s, %s, %s)",
-                              [u['user_id'], API.api_user_username(u['user_id']), 1, 0,
+                              [API.user_exist()['user_id'], user_id, 1, 0,
                                username,
-                               datetime.now().strftime('%d.%m.%Y %H:%M')])
+                               dt.now().strftime('%d.%m.%Y %H:%M')])
                 flash('Your request is added to pending.')
             except:
                 flash('You have still pending username change!')
 
-    return render_template('namechange.html', user=API.api_user_username(u['user_id']),
-                           p=p, perm=perm)
+    return render_template('namechange.html', user=user_id, user_privilege=user_privilege)
 
 
 @app.route('/manage/usernamechanges/')
 def manage_usernamechanges():
-    if not API.is_login(check_for_admin=True):
+    if not API.is_chatmod():
         return redirect(url_for('index'))
 
-    u = API.get_user()
-    p, perm = API.get_privileges()
+    user_id = API.api_user_username(API.user_exist()['user_id'])
+    user_privilege = API.user_privilege()
 
     connection, cursor = mysql.connect()
     get_requests = mysql.execute(connection, cursor,
                                  "SELECT * FROM requests WHERE category = 1").fetchall()
-    return render_template('manageusernamechanges.html',
-                           user=API.api_user_username(u['user_id']),
-                           p=p, perm=perm, r=get_requests)
+    return render_template('manageusernamechanges.html', user=user_id, user_privilege=user_privilege, r=get_requests)
 
 
 @app.route('/manage/banappeals/')
 def manage_banappeals():
-    if not API.is_login(check_for_admin=True):
+    if not API.is_admin():
         return redirect(url_for('index'))
 
-    u = API.get_user()
-    p, perm = API.get_privileges()
+    user_id = API.api_user_username(API.user_exist()['user_id'])
+    user_privilege = API.user_privilege()
 
     connection, cursor = mysql.connect()
     get_requests = mysql.execute(connection, cursor,
                                  "SELECT * FROM requests WHERE category = 2").fetchall()
-    return render_template('managebanappeals.html',
-                           user=API.api_user_username(u['user_id']),
-                           p=p, perm=perm, r=get_requests)
+    return render_template('managebanappeals.html', user=user_id, user_privilege=user_privilege, r=get_requests)
 
 
 @app.route('/logs/')
 def logs():
-    if not API.is_login(check_for_admin=True):
+    if not API.is_admin():
         return redirect(url_for('index'))
 
-    u = API.get_user()
-    p, perm = API.get_privileges()
+    user_id = API.api_user_username(API.user_exist()['user_id'])
+    user_privilege = API.user_privilege()
 
     connection, cursor = mysql.connect()
     get_requests = mysql.execute(connection, cursor,
                                  "SELECT username, text, date FROM logs ORDER BY id desc").fetchall()
-    return render_template('logs.html',
-                           user=API.api_user_username(u['user_id']),
-                           p=p, perm=perm, r=get_requests)
+    return render_template('logs.html', user=user_id, user_privilege=user_privilege, r=get_requests)
 
 
 @app.errorhandler(404)
