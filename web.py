@@ -22,7 +22,7 @@ app.config['MAIL_PASSWORD'] = config_email['MAIL_PASSWORD']
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_DEFAULT_SENDER'] = config_email['MAIL_USERNAME']
-app.config['MAIL_DEBUG'] = True
+app.config['MAIL_DEBUG'] = False
 
 mail = Mail()
 mail.init_app(app)
@@ -106,9 +106,9 @@ def ripple_logout():
         requests.post('https://ripple.moe/api/v1/tokens/self/delete',
                       headers=headers).json()
 
-        connection, cursor = mysql.connect()
-        mysql.execute(connection, cursor, "DELETE from users WHERE access_token = %s",
-                      [access_token])
+        # Removed since we will switch to use custom privileges
+        #connection, cursor = mysql.connect()
+        #mysql.execute(connection, cursor, "DELETE from users WHERE access_token = %s", [access_token])
 
         red = make_response(redirect(url_for('index')))
         red.set_cookie('ACCESS_TOKEN', '', expires=0)
