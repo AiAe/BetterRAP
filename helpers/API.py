@@ -1,7 +1,7 @@
 from flask import request
 import requests
 from datetime import datetime
-from helpers import mysql, Privileges
+from helpers import mysql
 
 
 def api_user_username(user_id):
@@ -49,28 +49,27 @@ def user_privilege():
     if not user_exist():
         return {'perm': 0, 'badge': 'Nothing'}
 
-    p = api_user_privileges(user_exist()['user_id'])
+    user_perm = user_exist()['perm']
 
-    if (p & Privileges.UserNormal) > 0:
+    if user_perm == 0:
+        badge = {'perm': 0, 'badge': 'Restricted'}
+
+    if user_perm == 1:
         badge = {'perm': 1, 'badge': 'User'}
 
-    if (p & Privileges.AdminChatMod) > 0:
-        badge = {'perm': 1, 'badge': 'Chat Mod'}
+    if user_perm == 2:
+        badge = {'perm': 2, 'badge': 'Chat Mod'}
 
-    if (p & Privileges.AdminBanUsers) > 0:
+    if user_perm == 3:
         badge = {'perm': 3, 'badge': 'Community Manager'}
 
-    if (p & Privileges.AdminManagePrivileges) > 0:
-        badge = {'perm': 3, 'badge': 'Developer'}
-
-    if (p & Privileges.UserPublic) == 0:
-        badge = {'perm': 69, 'badge': 'Restricted'}
+    if user_perm == 4:
+        badge = {'perm': 4, 'badge': 'Developer'}
 
     return badge
 
 
 def is_chatmod():
-
     user_perm = user_exist()['perm']
 
     if user_perm == 2:
@@ -81,9 +80,9 @@ def is_chatmod():
 
 
 def is_admin():
-    p = user_privilege()
+    user_perm = user_exist()['perm']
 
-    if p['perm'] >= 3:
+    if user_perm == 3:
         return True
 
     return False

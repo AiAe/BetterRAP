@@ -27,10 +27,11 @@
             <a class="item" href="{{ url_for('request_namechange') }}">Name change</a>
             <a class="item" href="#">Flag change</a>
             {% endif %}
-            {% if user_privilege.perm == 69 %}
+            {% if user_privilege.perm == 0 %}
             <a class="item" href="{{ url_for('request_banappeal') }}">Ban Appeal</a>
             {% endif %}
             <div class="firetrucking-right-menu">
+                {% if user_privilege.perm > 1 %}
                 <div class="ui dropdown item">
                     <span>Control Panel</span>
                     <div class="menu">
@@ -43,6 +44,7 @@
                         {% endif %}
                     </div>
                 </div>
+                {% endif %}
                 <div class="ui dropdown item">
                     <span>{{ user }}</span>
                     <div class="menu">
