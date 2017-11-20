@@ -49,23 +49,26 @@ def user_privilege():
     if not user_exist():
         return {'perm': 0, 'badge': 'Nothing'}
 
+    badge = {'perm': 1, 'badge': 'User'}
+
     p = api_user_privileges(user_exist()['user_id'])
 
     if (p & Privileges.UserNormal) > 0:
-        return {'perm': 1, 'badge': 'User'}
+        badge = {'perm': 1, 'badge': 'User'}
 
     if (p & Privileges.AdminChatMod) > 0:
-        return {'perm': 2, 'badge': 'Chat Mod'}
+        badge = {'perm': 2, 'badge': 'Chat Mod'}
 
     if (p & Privileges.AdminBanUsers) > 0:
-        return {'perm': 3, 'badge': 'Community Manager'}
+        badge = {'perm': 3, 'badge': 'Community Manager'}
 
     if (p & Privileges.AdminManagePrivileges) > 0:
-        return {'perm': 3, 'badge': 'Developer'}
+        badge = {'perm': 3, 'badge': 'Developer'}
 
     if (p & Privileges.UserPublic) == 0:
-        return {'perm': 1, 'badge': 'Restricted'}
+        badge = {'perm': 1, 'badge': 'Restricted'}
 
+    return badge
 
 def is_chatmod():
     text, perm = user_privilege()
