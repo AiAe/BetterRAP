@@ -167,7 +167,7 @@ def request_banappeal():
             try:
                 mysql.execute(connection, cursor,
                               "INSERT INTO requests (user_id, username, category, text, date) VALUES (%s, %s, %s, %s, %s)",
-                              [u['user_id'], API.api_user_username(u['user_id']), 2, text,
+                              [user_id, API.api_user_username(user_id), 2, text,
                                datetime.now().strftime('%d.%m.%Y %H:%M')])
 
                 flash('Thanks for appealing, it can take up to 7 days for us to review.')
