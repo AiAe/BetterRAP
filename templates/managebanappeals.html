@@ -1,9 +1,9 @@
 {% extends 'layout.html' %}
-{% block title %} Dashboard ban appeals{% endblock %}
+{% block title %} Manage ban appeals{% endblock %}
 {% block body %}
 <div class="card text-black bg-light">
     <div class="card-body">
-        <table class="table table-striped table-hover table-bordered">
+        <table class="ui fixed table">
             <thead class="thead-dark">
             <tr>
                 <th>Username</th>
@@ -14,7 +14,6 @@
             </thead>
             <tbody>
             {% for request in r %}
-
             <tr>
                 <td><a href="https://ripple.moe/u/{{ request.user_id }}">{{ request.username }}</a></td>
                 <td><a href="#" class="btn btn-success">Read appeal</a></td>

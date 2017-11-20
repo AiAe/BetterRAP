@@ -1,14 +1,8 @@
 {% extends 'layout1.html' %}
 {% block title %} Login {% endblock %}
 {% block body %}
-<div class="logincenter">
-    <img src="{{ url_for('static', filename='img/eggplant.png') }}">
-    <div class="card text-white bg-primary">
-        <div class="card-body">
-            <a href="https://ripple.moe/oauth/authorize?response_type=code&client_id={{ client_id }}&redirect_url={{ redirect_url }}" class="btn btn-primary btn-lg btn-block">Login with
-                Ripple
-            </a>
-        </div>
-    </div>
-</div>
+<a href="https://ripple.moe/oauth/authorize?response_type=code&client_id={{ client_id }}&redirect_url={{ redirect_url }}"
+   class="ui blue basic button">Login with
+    Ripple
+</a>
 {% endblock %}

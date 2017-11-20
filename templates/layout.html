@@ -2,92 +2,78 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Better RAP - {% block title %}{% endblock %}</title>
+    <title>Ripple Support - {% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="author" content="Daniel Dimitrov">
     <link type="text/css" rel="stylesheet"
-          href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+          href="{{ url_for('static', filename='css/semantic.min.css') }}">
+    <link type="text/css" rel="stylesheet"
+          href="{{ url_for('static', filename='css/ripple.css') }}">
     <link rel="shortcut icon"
           href="{{ url_for('static', filename='img/eggplant.png') }}"/>
 </head>
-<body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" href="#">Better RAP</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#navbarColor01" aria-controls="navbarColor01"
-                aria-expanded="false" aria-label="Toggle navigation" style="">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarColor01">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('home') }}">Home</a>
-                </li>
-                {% if user_privilege.perm == 1 %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('request_namechange') }}">Request
-                        name change</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Request flag change</a>
-                </li>
-                {% endif %}
-                {% if user_privilege.perm == 0 %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('request_banappeal') }}">Ban
-                        Appeal</a>
-                </li>
-                {% endif %}
-                {% if user_privilege.perm >= 2 %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('manage_usernamechanges') }}">Manage name changes</a>
-                </li>
-                {% endif %}
-                {% if user_privilege.perm >= 3 %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('manage_banappeals') }}">Manage appeals</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('logs') }}">Logs</a>
-                </li>
-                {% endif %}
-            </ul>
-            <ul class="nav navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Welcome {{ user }} <span
-                            class="badge badge-primary">{{ user_privilege.badge }}</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('ripple_logout') }}">Logout</a>
-                </li>
-            </ul>
+<body class="ds">
+<div class="ui full height main wrapper">
+    <div class="ui secondary fixed-height stackable white background main menu no margin bottom" id="navbar">
+        <div class="ui container">
+            <div class="item">
+                <b><a href="/" title="Home page"><img class="ripple logo"
+                                                      src="https://ripple.moe/static/logos/text-white.png"
+                                                      alt="Ripple"></a></b>
+            </div>
+            <a class="item" href="{{ url_for('home') }}">Home</a>
+            {% if user_privilege.perm >= 1 %}
+            <a class="item" href="{{ url_for('request_namechange') }}">Name change</a>
+            <a class="item" href="#">Flag change</a>
+            {% endif %}
+            {% if user_privilege.perm == 0 %}
+            <a class="item" href="{{ url_for('request_banappeal') }}">Ban Appeal</a>
+            {% endif %}
+            <div class="firetrucking-right-menu">
+                <div class="ui dropdown item">
+                    <span>Control Panel</span>
+                    <div class="menu">
+                        {% if user_privilege.perm >= 2 %}
+                        <a class="item" href="{{ url_for('manage_usernamechanges') }}">Manage name changes</a>
+                        {% endif %}
+                        {% if user_privilege.perm >= 3 %}
+                        <a class="item" href="{{ url_for('manage_banappeals') }}">Manage appeals</a>
+                        <a class="item" href="{{ url_for('logs') }}">Logs</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="ui dropdown item">
+                    <span>{{ user }}</span>
+                    <div class="menu">
+                        <a class="item">{{ user_privilege.badge }}</a>
+                        <a class="item" href="{{ url_for('ripple_logout') }}">Logout</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</nav>
-<br>
-<div class="container">
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <div class="container">
-        <div class="flash-error">
-            <div class="alert alert-dismissible alert-warning">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
+
+    <div class="huge heading  dropped" style="background-image: url('{{ url_for('static', filename='img/bg.jpg') }}');">
+        <h1>{{ self.title() }}</h1>
+    </div>
+    <div class="ui container">
+        <div class="ui raised segment">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="ui warning message">
                 {% for message in messages %}
                 {{ message }} <br>
                 {% endfor %}
             </div>
+            {% endif %}
+            {% endwith %}
+            {% block body %}
+            {% endblock %}
         </div>
     </div>
-    {% endif %}
-    {% endwith %}
-    {% block body %}
-    {% endblock %}
 </div>
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dist.min.js') }}"></script>
 </body>
 </html>

@@ -1,9 +1,9 @@
 {% extends 'layout.html' %}
-{% block title %} Dashboard name changes {% endblock %}
+{% block title %} Manage name changes {% endblock %}
 {% block body %}
 <div class="card text-black bg-light">
     <div class="card-body">
-        <table class="table table-striped table-hover table-bordered">
+        <table class="ui fixed table">
             <thead class="thead-dark">
             <tr>
                 <th>#</th>
@@ -11,7 +11,7 @@
                 <th>Requested username</th>
                 <th>Used in osu</th>
                 <th>Date</th>
-                <th>Actions</th>
+                <th class="three wide">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -30,8 +30,8 @@
                 </td>
                 <td>{{ request.date }}</td>
                 <td>
-                    <a href="{{ url_for('api_user_edit', user_id = request.user_id, username = request.new_username) }}" type="button" class="btn btn-success">Approve</a>
-                    <a href="" type="button" class="btn btn-danger">Deny</a>
+                    <a href="{{ url_for('api_user_edit', user_id = request.user_id, username = request.new_username) }}" type="button" class="ui inverted green button">Approve</a>
+                    <a href="" type="button" class="ui inverted red button">Deny</a>
                 </td>
             </tr>
             {% endfor %}

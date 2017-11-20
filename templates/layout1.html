@@ -7,15 +7,31 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="author" content="Daniel Dimitrov">
     <link type="text/css" rel="stylesheet"
-          href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+          href="{{ url_for('static', filename='css/semantic.min.css') }}">
     <link type="text/css" rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+          href="{{ url_for('static', filename='css/ripple.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/eggplant.png') }}"/>
 </head>
-<body>
-<div class="container">
-    {% block body %}
-    {% endblock %}
+<body class="ds">
+<div class="ui full height main wrapper">
+    <div class="ui secondary fixed-height stackable white background main menu no margin bottom" id="navbar">
+        <div class="ui container">
+            <div class="item">
+                <b><a href="/" title="Home page"><img class="ripple logo"
+                                                      src="https://ripple.moe/static/logos/text-white.png"
+                                                      alt="Ripple"></a></b>
+            </div>
+        </div>
+    </div>
+    <div class="huge heading  dropped" style="background-image: url('{{ url_for('static', filename='img/bg.jpg') }}');">
+        <h1>{{ self.title() }}</h1>
+    </div>
+    <div class="tiny container">
+        <div class="ui center aligned segment">
+            {% block body %}
+            {% endblock %}
+        </div>
+    </div>
 </div>
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>

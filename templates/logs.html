@@ -1,19 +1,15 @@
 {% extends 'layout.html' %}
 {% block title %} Logs {% endblock %}
 {% block body %}
-<div class="card text-black bg-light">
-    <div class="card-body">
-        {% for request in r %}
-        <div class="card border-primary">
-            <div class="card-body">
-                <blockquote class="card-blockquote">
-                    <p><b>{{ request.text }}</b></p>
-                    <footer>By {{ request.username }} at {{ request.date }}</footer>
-                </blockquote>
-            </div>
+<div class="ui cards">
+    {% for request in r %}
+    <div class="card">
+        <div class="content">
+            <div class="header">{{ request.username }}</div>
+            <div class="meta">{{ request.date }}</div>
+            <div class="description">{{ request.text }}</div>
         </div>
-        <br>
-        {% endfor %}
     </div>
+    {% endfor %}
 </div>
 {% endblock %}
