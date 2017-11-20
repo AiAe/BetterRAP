@@ -3,6 +3,7 @@ import requests
 import datetime
 from datetime import datetime as dt
 import json
+from flask_mail import Mail, Message
 from helpers import mysql, API
 
 with open("config.json", "r") as f:
@@ -10,6 +11,41 @@ with open("config.json", "r") as f:
 
 app = Flask(__name__)
 app.secret_key = 'betterrapisawesome'
+
+app.config['MAIL_SERVER'] = "smtp.gmail.com"
+app.config['MAIL_PORT'] = "465"
+app.config['MAIL_USERNAME'] = ""
+app.config['MAIL_PASSWORD'] = ""
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_DEFAULT_SENDER'] = ""
+app.config['MAIL_DEBUG'] = True
+
+mail = Mail()
+mail.init_app(app)
+
+
+def send_email(email, d):
+
+    with open("config.json", "r") as f:
+        draft = json.load(f)
+
+    if d == 0:
+        text = draft['accept_appeal_cheating']
+    elif d == 1:
+        text = draft['accept_appeal_multi']
+    elif d == 2:
+        text = draft['accept_username']
+    elif d == 3:
+        text = draft['deny_appeal_multi']
+    elif d == 4:
+        text = draft['deny_appeal']
+    elif d == 5:
+        text = draft['deny_username']
+
+    msg = Message('osu!fx Email activation', recipients=email)
+    msg.body = text
+    mail.send(msg)
 
 
 @app.route('/oauth/ripple/')
@@ -57,16 +93,16 @@ def ripple_aouth():
 def ripple_logout():
     if API.is_login():
 
-        ACCESS_TOKEN = request.cookies.get('ACCESS_TOKEN')
+        access_token = request.cookies.get('ACCESS_TOKEN')
 
-        headers = {'Authorization': 'Bearer ' + ACCESS_TOKEN}
+        headers = {'Authorization': 'Bearer ' + access_token}
 
         requests.post('https://ripple.moe/api/v1/tokens/self/delete',
                       headers=headers).json()
 
         connection, cursor = mysql.connect()
         mysql.execute(connection, cursor, "DELETE from users WHERE access_token = %s",
-                      [ACCESS_TOKEN])
+                      [access_token])
 
         red = make_response(redirect(url_for('index')))
         red.set_cookie('ACCESS_TOKEN', '', expires=0)
@@ -129,6 +165,8 @@ def api_user_edit():
     mysql.execute(connection, cursor, "DELETE from requests WHERE new_username = %s",
                   [request.args['username']])
 
+
+
     flash('Changed username from {} to {}.'.format(user["username"],
                                                    request.args['username']))
     return redirect(url_for('manage_usernamechanges'))
@@ -151,7 +189,7 @@ def request_banappeal():
         q5 = request.form['q5']
         q6 = request.form['q6']
 
-        if all([q1, q2, q3, q4, q5, q6]) == False:
+        if not all([q1, q2, q3, q4, q5, q6]):
             flash('Please fill everything!')
         else:
             text = "List any and all other accounts you have used or created: {}\n" \
@@ -173,7 +211,6 @@ def request_banappeal():
                 flash('Thanks for appealing, it can take up to 7 days for us to review.')
 
             except:
-
                 flash("I see you really want to get unrestricted, don't we will review your appeal soon.")
 
     return render_template('banappeal.html', user=user_id, user_privilege=user_privilege)
