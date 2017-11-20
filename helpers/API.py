@@ -36,7 +36,7 @@ def user_exist():
         connection, cursor = mysql.connect()
         access_token = request.cookies.get('ACCESS_TOKEN')
 
-        result = mysql.execute(connection, cursor, "SELECT user_id FROM users WHERE access_token = %s",
+        result = mysql.execute(connection, cursor, "SELECT user_id, perm FROM users WHERE access_token = %s",
                                [access_token]).fetchone()
 
         if result and len(result) > 0:
@@ -55,7 +55,7 @@ def user_privilege():
         badge = {'perm': 1, 'badge': 'User'}
 
     if (p & Privileges.AdminChatMod) > 0:
-        badge = {'perm': 2, 'badge': 'Chat Mod'}
+        badge = {'perm': 1, 'badge': 'Chat Mod'}
 
     if (p & Privileges.AdminBanUsers) > 0:
         badge = {'perm': 3, 'badge': 'Community Manager'}
@@ -70,9 +70,11 @@ def user_privilege():
 
 
 def is_chatmod():
-    p = user_privilege()
 
-    if p['perm'] >= 2:
+    user_perm = user_exist()['perm']
+
+    if user_perm == 2:
+
         return True
 
     return False
