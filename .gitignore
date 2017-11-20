@@ -101,6 +101,5 @@ ENV/
 .mypy_cache/
 
 .idea/*
-*.json
-mysql.json
-mysql.json
+ripple.json
+email.json
