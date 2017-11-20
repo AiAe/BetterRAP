@@ -49,8 +49,6 @@ def user_privilege():
     if not user_exist():
         return {'perm': 0, 'badge': 'Nothing'}
 
-    badge = {'perm': 1, 'badge': 'User'}
-
     p = api_user_privileges(user_exist()['user_id'])
 
     if (p & Privileges.UserNormal) > 0:
@@ -66,7 +64,7 @@ def user_privilege():
         badge = {'perm': 3, 'badge': 'Developer'}
 
     if (p & Privileges.UserPublic) == 0:
-        badge = {'perm': 1, 'badge': 'Restricted'}
+        badge = {'perm': 69, 'badge': 'Restricted'}
 
     return badge
 
