@@ -6,16 +6,21 @@
     <div class="card-body">
         <blockquote class="card-blockquote">
             <h1>Welcome to Ripple Support, {{ user.username }}!</h1>
-            <p>Here you can open up a ticket if you have any account related issues such as <a href="{{ url_for('request_namechange') }}">name change</a> 
-                requests, <a href="/">flag change</a> requests or <a href="{{ url_for('request_banappeal') }}">restriction appeals</a>.
+            <p>Here you can open up a ticket if you have any account related issues such as name change
+                requests, flag change requests or restriction appeals.
                 With the increasing amount of support emails that come in, it ultimately became hard to keep track of each individual's tickets. 
                 Therefore we've designed this system to make sure no ticket gets left unnoticed.</p>
 
             <p>As stated before you can send in a ticket for a various amount of things including: </p>
             <ul>
-                <li><a href="{{ url_for('request_namechange') }}">Name Changes</a></li>
-                <li><a href="/">Flag Changes</a></li>
-                <li><a href="{{ url_for('request_banappeal') }}">Restriction Appeals</a></li>
+                {% if user_privilege.perm >= 1 %}
+                    <li><a href="{{ url_for('request_namechange') }}">Name Changes</a></li>
+                    <li><a href="/">Flag Changes</a></li>
+                {% endif %}
+
+                {% if user_privilege.perm == 0 %}
+                    <li><a href="{{ url_for('request_banappeal') }}">Restriction Appeals</a></li>
+                {% endif %}
             </ul>
 
             <p>If you have any questions or concerns that aren't related to the above, feel free to send us an email,
