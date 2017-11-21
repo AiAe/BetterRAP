@@ -25,6 +25,21 @@ def user_logged_in():
     access_token = request.cookies.get('ACCESS_TOKEN')
 
     if access_token:
+
+        connection, cursor = mysql.connect()
+
+        user = mysql.execute(connection, cursor, "SELECT user_id FROM users WHERE access_token = %s",
+                             [access_token]).fetchone()
+
+        perm = api_user_privileges(user['user_id'])
+
+        if (perm & 1) == 0:
+            mysql.execute(connection, cursor, "UPDATE users SET perm = %s WHERE access_token = %s", [0, access_token])
+
+        else:
+            if perm == 0:
+                mysql.execute(connection, cursor, "UPDATE users SET perm = %s WHERE access_token = %s", [1, access_token])
+
         return True
 
     return False
@@ -69,11 +84,28 @@ def user_privilege():
     return badge
 
 
+def is_restricted():
+    user_perm = user_exist()['perm']
+
+    if user_perm == 0:
+        return True
+
+    return False
+
+
+def is_user():
+    user_perm = user_exist()['perm']
+
+    if user_perm >= 1:
+        return True
+
+    return False
+
+
 def is_chatmod():
     user_perm = user_exist()['perm']
 
     if user_perm >= 2:
-
         return True
 
     return False
@@ -82,7 +114,7 @@ def is_chatmod():
 def is_admin():
     user_perm = user_exist()['perm']
 
-    if user_perm == 3:
+    if user_perm >= 3:
         return True
 
     return False
