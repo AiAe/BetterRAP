@@ -311,7 +311,7 @@ def request_namechange():
 
 @app.route('/manage/usernamechanges/')
 def manage_usernamechanges():
-    if not API.is_chatmod():
+    if not API.user_logged_in() or not API.is_chatmod():
         return redirect(url_for('index'))
 
     user = API.api_user_username(API.user_exist()['user_id'])
@@ -325,7 +325,7 @@ def manage_usernamechanges():
 
 @app.route('/manage/banappeals/')
 def manage_banappeals():
-    if not API.is_admin():
+    if not API.user_logged_in() or not API.is_admin():
         return redirect(url_for('index'))
 
     user = API.api_user_username(API.user_exist()['user_id'])
@@ -339,7 +339,7 @@ def manage_banappeals():
 
 @app.route('/logs/')
 def logs():
-    if not API.is_admin():
+    if not API.user_logged_in() or not API.is_admin():
         return redirect(url_for('index'))
 
     user_id = API.api_user_username(API.user_exist()['user_id'])
