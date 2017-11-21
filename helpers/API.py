@@ -19,11 +19,12 @@ def api_user_username(user_id):
 def api_user_check(username, token):
     user = requests.get('https://api.ripple.moe/api/v1/users', params={'name': username, 'token': token}).json()
 
-    if user["code"] == 404:
+    if int(user["code"]) == 404:
         return False
 
     else:
         return True
+
 
 def api_user_privileges(user_id):
     user = requests.get('https://api.ripple.moe/api/v1/users', params={'id': user_id}).json()
