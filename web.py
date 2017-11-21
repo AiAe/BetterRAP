@@ -156,7 +156,7 @@ def api_user_deny():
 
     text = 'Deny username change from {} to {}'.format(request.args['u'], request.args['username'])
 
-    API.logging(username, u["user_id"], text)
+    API.logging(username['username'], u["user_id"], text)
 
     mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s",
                   [user_id])
@@ -209,7 +209,7 @@ def api_user_edit():
 
         text = 'Changed username from {} to {}'.format(user["username"], request.args['username'])
 
-        API.logging(username, u["user_id"], text)
+        API.logging(username['username'], u["user_id"], text)
 
         mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s",
                       [user_id])
