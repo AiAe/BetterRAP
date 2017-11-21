@@ -141,6 +141,12 @@ def api_user_deny():
     if not request.args:
         return 'I love hackers'
 
+    user_id = request.args['user_id']
+
+    if not API.user_in_db(user_id):
+
+        return 'kys'
+
     u = API.user_exist()
     username = API.api_user_username(u['user_id'])
     connection, cursor = mysql.connect()
@@ -150,9 +156,9 @@ def api_user_deny():
     API.logging(username, u["user_id"], text)
 
     mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s",
-                  [request.args['user_id']])
+                  [user_id])
 
-    get_email = API.api_user_full(request.args['user_id'], ripple_config['token'])["email"]
+    get_email = API.api_user_full(user_id, ripple_config['token'])["email"]
 
     send_email(get_email, 5)
 
@@ -165,6 +171,12 @@ def api_user_deny():
 def api_user_edit():
     if not request.args:
         return 'I love hackers'
+
+    user_id = request.args['user_id']
+
+    if not API.user_in_db(user_id):
+
+        return 'kys'
 
     params = {
         'token': ripple_config['token'],
@@ -190,9 +202,9 @@ def api_user_edit():
         API.logging(username, u["user_id"], text)
 
         mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s",
-                      [request.args['user_id']])
+                      [user_id])
 
-        get_email = API.api_user_full(request.args['user_id'], ripple_config['token'])["email"]
+        get_email = API.api_user_full(user_id, ripple_config['token'])["email"]
 
         send_email(get_email, 2)
 

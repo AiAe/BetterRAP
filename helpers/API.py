@@ -27,6 +27,18 @@ def api_user_edit(params, json_data):
                          json=json_data).json()
 
 
+def user_in_db(user_id):
+    connection, cursor = mysql.connect()
+
+    result = mysql.execute(connection, cursor, "SELECT user_id FROM requests WHERE user_id = %s",
+                           [user_id]).fetchone()
+
+    if result and len(result) > 0:
+        return True
+
+    return False
+
+
 def user_logged_in():
     access_token = request.cookies.get('ACCESS_TOKEN')
 
