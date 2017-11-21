@@ -5,25 +5,25 @@ from helpers import mysql
 
 
 def api_user_full(user_id, token):
-    user = requests.get('https://ripple.moe/api/v1/users/full', params={'id': user_id, 'token': token}).json()
+    user = requests.get('https://api.ripple.moe/api/v1/users/full', params={'id': user_id, 'token': token}).json()
 
     return user
 
 
 def api_user_username(user_id):
-    user = requests.get('https://ripple.moe/api/v1/users', params={'id': user_id}).json()
+    user = requests.get('https://api.ripple.moe/api/v1/users', params={'id': user_id}).json()
 
     return user['username']
 
 
 def api_user_privileges(user_id):
-    user = requests.get('https://ripple.moe/api/v1/users', params={'id': user_id}).json()
+    user = requests.get('https://api.ripple.moe/api/v1/users', params={'id': user_id}).json()
 
     return user['privileges']
 
 
 def api_user_edit(params, json_data):
-    return requests.post('https://ripple.moe/api/v1/users/edit', params=params,
+    return requests.post('https://api.ripple.moe/api/v1/users/edit', params=params,
                          json=json_data).json()
 
 

@@ -7,6 +7,7 @@ import json
 from flask_mail import Mail, Message
 from helpers import mysql, API
 
+#path = ''
 path = '/home/ubuntu/CONFIG/'
 
 with open(path + "config.json", "r") as f:
