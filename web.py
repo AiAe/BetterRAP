@@ -147,7 +147,6 @@ def api_user_deny():
     user_id = request.args['user_id']
 
     if not API.user_in_db(user_id):
-
         return 'kys'
 
     u = API.user_exist()
@@ -161,7 +160,7 @@ def api_user_deny():
     mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s",
                   [user_id])
 
-    get_email = API.api_user_full(user_id, ripple_config['token'])["email"]
+    get_email = API.api_user_full(user_id)["email"]
 
     try:
         send_email(get_email, 5)
@@ -175,7 +174,6 @@ def api_user_deny():
 
 @app.route('/request/')
 def api_user_edit():
-
     if not API.is_chatmod():
         return redirect(url_for('index'))
 
@@ -185,7 +183,6 @@ def api_user_edit():
     user_id = request.args['user_id']
 
     if not API.user_in_db(user_id):
-
         return 'kys'
 
     params = {
@@ -214,7 +211,7 @@ def api_user_edit():
         mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s",
                       [user_id])
 
-        get_email = API.api_user_full(user_id, ripple_config['token'])["email"]
+        get_email = API.api_user_full(user_id)["email"]
 
         try:
             send_email(get_email, 2)
@@ -260,7 +257,7 @@ def request_banappeal():
                 mysql.execute(connection, cursor,
                               "INSERT INTO requests (user_id, username, category, text, date) VALUES (%s, %s, %s, %s, %s)",
                               [user['id'], user['username'], 2, text,
-                               datetime.now().strftime('%d.%m.%Y %H:%M')])
+                               dt.now().strftime('%d.%m.%Y %H:%M')])
 
                 flash('Thanks for appealing, it can take up to 7 days for us to review.')
 
@@ -290,16 +287,21 @@ def request_namechange():
         if not re.match(regex, username):
             flash("Failed to verify username, please don't use special characters.")
 
-        if API.api_user_check(username, ripple_config['token']):
-
+        if API.api_user_check(username):
             flash("Username is in use!")
 
-        if username and re.match(regex, username) and not API.api_user_check(username, ripple_config['token']):
+        if API.api_osu_user_check(username):
+            used = 1
+
+        else:
+            used = 0
+
+        if username and re.match(regex, username) and not API.api_user_check(username):
             connection, cursor = mysql.connect()
             try:
                 mysql.execute(connection, cursor,
                               "INSERT INTO requests (user_id, username, category, used, new_username, date) VALUES (%s, %s, %s, %s, %s, %s)",
-                              [user['id'], user['username'], 1, 0,
+                              [user['id'], user['username'], 1, used,
                                username,
                                dt.now().strftime('%d.%m.%Y %H:%M')])
                 flash('Your request is added to pending.')
