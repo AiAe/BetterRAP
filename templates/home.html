@@ -2,13 +2,20 @@
 {% block title %} Welcome to Ripple Support {% endblock %}
 {% block body %}
 <div class="card text-black bg-light">
+     <div class="ui center aligned segment"><img src="/static/img/logo-pink-dark.svg"></div>
     <div class="card-body">
         <blockquote class="card-blockquote">
-            <h2>Welcome to Ripple Support.</h2>
-            <p>If you have any account related issues such as <a href="{{ url_for('request_namechange') }}">name change</a> requests, 
-                <a href=""flag change</a> requests or <a href="{{ url_for('request_banappeal') }}">restriction appeals</a>, this is the place to do it. 
-                If you have any other questions that are unrelated to appeals or name/flag change requests,
-                send us an email at <a href="mailto:support@ripple.moe">support@ripple.moe</a></p>
+            <h1>Welcome to Ripple Support, {{ user }}!</h1>
+            <p>Here you can open up a ticket if you have any account related issues such as <a href="{{ url_for('request_namechange') }}">name change</a> 
+                requests, <a href="/">flag change</a> requests or <a href="{{ url_for('request_banappeal') }}">restriction appeals</a>.
+                With the increasing amount of support emails that come in, it ultimately became hard to keep track of each individual's tickets. 
+                Therefore we've designed this system to make sure no ticket gets left unnoticed.</p>
+
+            <p>If you have any questions or concerns that aren't related to name/flag changes or restriction appeals, feel free to send us an email,
+                and we will get back to you as soon as possible. You can reach us at <a href="mailto:support@ripple.moe">support@ripple.moe</a>.</p>
+
+            <br/>
+            <a href="mailto:support@ripple.moe" class="ui primary button">Email Support</a>
         </blockquote>
     </div>
 </div>
