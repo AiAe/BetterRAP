@@ -6,11 +6,19 @@ import json
 from flask_mail import Mail, Message
 from helpers import mysql, API
 
-with open("config.json", "r") as f:
+path = ''
+
+with open(path + "config.json", "r") as f:
     config = json.load(f)
 
-with open("email.json", "r") as f:
+with open(path + "email.json", "r") as f:
     config_email = json.load(f)
+
+with open(path + "drafts.json", "r") as f:
+    draft = json.load(f)
+
+with open(path + "ripple.json", "r") as f:
+    ripple_config = json.load(f)
 
 app = Flask(__name__)
 app.secret_key = 'betterrapisawesome'
@@ -29,9 +37,6 @@ mail.init_app(app)
 
 
 def send_email(email, d):
-    with open("drafts.json", "r") as f:
-        draft = json.load(f)
-
     if d == 0:
         text = draft['accept_appeal_cheating']
     elif d == 1:
@@ -55,9 +60,6 @@ def send_email(email, d):
 
 @app.route('/oauth/ripple/')
 def ripple_aouth():
-    with open("ripple.json", "r") as f:
-        ripple_config = json.load(f)
-
     if not request.args:
         return 'I love hackers'
 
@@ -96,18 +98,13 @@ def ripple_aouth():
 
 @app.route('/oauth/ripple/logout/')
 def ripple_logout():
-    if API.is_login():
-
+    if API.user_logged_in():
         access_token = request.cookies.get('ACCESS_TOKEN')
 
         headers = {'Authorization': 'Bearer ' + access_token}
 
         requests.post('https://ripple.moe/api/v1/tokens/self/delete',
                       headers=headers).json()
-
-        # Removed since we will switch to use custom privileges
-        # connection, cursor = mysql.connect()
-        # mysql.execute(connection, cursor, "DELETE from users WHERE access_token = %s", [access_token])
 
         red = make_response(redirect(url_for('index')))
         red.set_cookie('ACCESS_TOKEN', '', expires=0)
@@ -119,9 +116,6 @@ def ripple_logout():
 
 @app.route('/')
 def index():
-    with open("ripple.json", "r") as f:
-        ripple_config = json.load(f)
-
     if API.user_logged_in():
         return redirect(url_for('home'))
 
@@ -144,9 +138,6 @@ def home():
 def api_user_edit():
     if not request.args:
         return 'I love hackers'
-
-    with open("ripple.json", "r") as f:
-        ripple_config = json.load(f)
 
     params = {
         'token': ripple_config['token'],
