@@ -3,5 +3,5 @@
   "use_reloader": "True",
   "threaded": "True",
   "host": "127.0.0.1",
-  "port": 80
+  "port": 6933
 }
