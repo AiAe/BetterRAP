@@ -1,7 +1,9 @@
 import pymysql
 import json
 
-with open("mysql.json", "r") as f:
+path = ''
+
+with open(path + "mysql.json", "r") as f:
     config = json.load(f)
 
 def connect():
