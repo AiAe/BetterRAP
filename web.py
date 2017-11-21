@@ -138,6 +138,9 @@ def home():
 
 @app.route('/deny/')
 def api_user_deny():
+    if not API.is_chatmod():
+        return redirect(url_for('index'))
+
     if not request.args:
         return 'I love hackers'
 
@@ -160,7 +163,10 @@ def api_user_deny():
 
     get_email = API.api_user_full(user_id, ripple_config['token'])["email"]
 
-    send_email(get_email, 5)
+    try:
+        send_email(get_email, 5)
+    except:
+        flash('Failed to send, email is not valid.')
 
     flash('Deny username change from {} to {}.'.format(request.args['u'], request.args['username']))
 
@@ -169,6 +175,10 @@ def api_user_deny():
 
 @app.route('/request/')
 def api_user_edit():
+
+    if not API.is_chatmod():
+        return redirect(url_for('index'))
+
     if not request.args:
         return 'I love hackers'
 
@@ -206,7 +216,10 @@ def api_user_edit():
 
         get_email = API.api_user_full(user_id, ripple_config['token'])["email"]
 
-        send_email(get_email, 2)
+        try:
+            send_email(get_email, 2)
+        except:
+            flash('Failed to send, email is not valid.')
 
         flash('Changed username from {} to {}.'.format(user["username"],
                                                        request.args['username']))
@@ -277,7 +290,11 @@ def request_namechange():
         if not re.match(regex, username):
             flash("Failed to verify username, please don't use special characters.")
 
-        if username and re.match(regex, username):
+        if API.api_user_check(username, ripple_config['token']):
+
+            flash("Username is in use!")
+
+        if username and re.match(regex, username) and not API.api_user_check(username, ripple_config['token']):
             connection, cursor = mysql.connect()
             try:
                 mysql.execute(connection, cursor,
