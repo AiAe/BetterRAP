@@ -5,7 +5,7 @@
      <div class="ui center aligned"><center><img src="/static/img/logo-pink-dark.svg"></center></div>
     <div class="card-body">
         <blockquote class="card-blockquote">
-            <h1>Welcome to Ripple Support, {{ user }}!</h1>
+            <h1>Welcome to Ripple Support, {{ user.username }}!</h1>
             <p>Here you can open up a ticket if you have any account related issues such as <a href="{{ url_for('request_namechange') }}">name change</a> 
                 requests, <a href="/">flag change</a> requests or <a href="{{ url_for('request_banappeal') }}">restriction appeals</a>.
                 With the increasing amount of support emails that come in, it ultimately became hard to keep track of each individual's tickets. 
