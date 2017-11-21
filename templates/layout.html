@@ -24,23 +24,23 @@
             </div>
             <a class="item" href="{{ url_for('home') }}">Home</a>
             {% if user_privilege.perm >= 1 %}
-            <a class="item" href="{{ url_for('request_namechange') }}">Name change</a>
+            <a class="item" href="{{ url_for('request_namechange') }}">Name Change Request</a>
             <!--<a class="item" href="#">Flag change</a>-->
             {% endif %}
             {% if user_privilege.perm == 0 %}
-            <a class="item" href="{{ url_for('request_banappeal') }}">Ban Appeal</a>
+            <a class="item" href="{{ url_for('request_banappeal') }}">Restriction Appeal</a>
             {% endif %}
             <div class="firetrucking-right-menu">
                 {% if user_privilege.perm > 1 %}
                 <div class="ui dropdown item">
-                    <span>Control Panel</span>
+                    <span><strong>BetterRAP</strong></span>
                     <div class="menu">
                         {% if user_privilege.perm >= 2 %}
-                        <a class="item" href="{{ url_for('manage_usernamechanges') }}">Manage name changes</a>
+                        <a class="item" href="{{ url_for('manage_usernamechanges') }}">Manage Name Changes</a>
                         {% endif %}
                         {% if user_privilege.perm >= 3 %}
-                        <a class="item" href="{{ url_for('manage_banappeals') }}">Manage appeals</a>
-                        <a class="item" href="{{ url_for('logs') }}">Logs</a>
+                        <a class="item" href="{{ url_for('manage_banappeals') }}">Manage Appeals</a>
+                        <a class="item" href="{{ url_for('logs') }}">Admin Logs</a>
                         {% endif %}
                     </div>
                 </div>
