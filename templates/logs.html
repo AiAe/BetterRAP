@@ -5,7 +5,8 @@
     {% for request in r %}
     <div class="card">
         <div class="content">
-            <div class="header">{{ request.username }}</div>
+            <div class="header"><img class="ui avatar image" src="https://a.ripple.moe/{{ user.id }}"> {{ request.username }}</div>
+            <br/>
             <div class="meta">{{ request.date }}</div>
             <div class="description">{{ request.text }}</div>
         </div>
