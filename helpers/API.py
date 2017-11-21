@@ -4,6 +4,12 @@ from datetime import datetime
 from helpers import mysql
 
 
+def api_user_full(user_id, token):
+    user = requests.get('https://ripple.moe/api/v1/users/full', params={'id': user_id, 'token': token}).json()
+
+    return user
+
+
 def api_user_username(user_id):
     user = requests.get('https://ripple.moe/api/v1/users', params={'id': user_id}).json()
 
