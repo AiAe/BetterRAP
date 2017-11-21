@@ -46,7 +46,7 @@
                 </div>
                 {% endif %}
                 <div class="ui dropdown item">
-                    <span>{{ user }}</span>
+                    <span><img class="ui avatar image" src="https://a.ripple.moe/{{ user.id }}"> {{ user.username }}</span>
                     <div class="menu">
                         <a class="item">{{ user_privilege.badge }}</a>
                         <a class="item" href="{{ url_for('ripple_logout') }}">Logout</a>
