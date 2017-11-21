@@ -1,5 +1,6 @@
 from flask import Flask, make_response, redirect, request, render_template, url_for, flash
 import requests
+import re
 import datetime
 from datetime import datetime as dt
 import json
@@ -149,8 +150,8 @@ def api_user_edit():
     }
 
     user = API.api_user_edit(params, json_data)
-
-    if user['message'] == "Can't edit that user":
+    
+    if user['code'] != 200 and user['message'] == "Can't edit that user":
         flash("Can't edit that user!")
 
     else:
@@ -165,7 +166,9 @@ def api_user_edit():
         mysql.execute(connection, cursor, "DELETE from requests WHERE new_username = %s",
                       [request.args['username']])
 
-        send_email('aiae@ripple.moe', 2)
+        get_email = API.api_user_full(request.args['user_id'], ripple_config['token'])["email"]
+
+        send_email(get_email, 2)
 
         flash('Changed username from {} to {}.'.format(user["username"],
                                                        request.args['username']))
@@ -231,7 +234,12 @@ def request_namechange():
         if not username:
             flash('Username is empty!')
 
-        if username:
+        regex = r"^[A-Za-z0-9 _\[\]-]{2,15}$"
+
+        if not re.match(regex, username):
+            flash("Failed to verify username, please don't use special characters.")
+
+        if username and re.match(regex, username):
             connection, cursor = mysql.connect()
             try:
                 mysql.execute(connection, cursor,
