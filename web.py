@@ -29,7 +29,6 @@ mail.init_app(app)
 
 
 def send_email(email, d):
-
     with open("drafts.json", "r") as f:
         draft = json.load(f)
 
@@ -107,8 +106,8 @@ def ripple_logout():
                       headers=headers).json()
 
         # Removed since we will switch to use custom privileges
-        #connection, cursor = mysql.connect()
-        #mysql.execute(connection, cursor, "DELETE from users WHERE access_token = %s", [access_token])
+        # connection, cursor = mysql.connect()
+        # mysql.execute(connection, cursor, "DELETE from users WHERE access_token = %s", [access_token])
 
         red = make_response(redirect(url_for('index')))
         red.set_cookie('ACCESS_TOKEN', '', expires=0)
@@ -159,27 +158,32 @@ def api_user_edit():
     }
 
     user = API.api_user_edit(params, json_data)
-    u = API.user_exist()
-    username = API.api_user_username(u['user_id'])
-    connection, cursor = mysql.connect()
 
-    text = 'Changed username from {} to {}'.format(user["username"],request.args['username'])
+    if user['message'] == "Can't edit that user":
+        flash("Can't edit that user!")
 
-    API.logging(username, u["user_id"], text)
+    else:
+        u = API.user_exist()
+        username = API.api_user_username(u['user_id'])
+        connection, cursor = mysql.connect()
 
-    mysql.execute(connection, cursor, "DELETE from requests WHERE new_username = %s",
-                  [request.args['username']])
+        text = 'Changed username from {} to {}'.format(user["username"], request.args['username'])
 
-    send_email('bgdppeu@gmail.com', 2)
+        API.logging(username, u["user_id"], text)
 
-    flash('Changed username from {} to {}.'.format(user["username"],
-                                                   request.args['username']))
+        mysql.execute(connection, cursor, "DELETE from requests WHERE new_username = %s",
+                      [request.args['username']])
+
+        send_email('aiae@ripple.moe', 2)
+
+        flash('Changed username from {} to {}.'.format(user["username"],
+                                                       request.args['username']))
     return redirect(url_for('manage_usernamechanges'))
 
 
 @app.route('/banappeal/', methods=['GET', 'POST'])
 def request_banappeal():
-    if not API.user_logged_in():
+    if not API.user_logged_in() or not API.is_restricted():
         return redirect(url_for('index'))
 
     user_id = API.api_user_username(API.user_exist()['user_id'])
@@ -223,7 +227,7 @@ def request_banappeal():
 
 @app.route('/namechange/', methods=['GET', 'POST'])
 def request_namechange():
-    if not API.user_logged_in():
+    if not API.user_logged_in() or not API.is_user():
         return redirect(url_for('index'))
 
     user_id = API.api_user_username(API.user_exist()['user_id'])
