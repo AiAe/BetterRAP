@@ -347,7 +347,7 @@ def logs():
 
     connection, cursor = mysql.connect()
     get_requests = mysql.execute(connection, cursor,
-                                 "SELECT username, text, date FROM logs ORDER BY id desc").fetchall()
+                                 "SELECT * FROM logs ORDER BY id desc").fetchall()
     return render_template('logs.html', user=user_id, user_privilege=user_privilege, r=get_requests)
 
 
