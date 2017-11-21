@@ -7,7 +7,7 @@ import json
 from flask_mail import Mail, Message
 from helpers import mysql, API
 
-path = ''
+path = '/home/ubuntu/CONFIG/'
 
 with open(path + "config.json", "r") as f:
     config = json.load(f)
@@ -150,7 +150,7 @@ def api_user_edit():
     }
 
     user = API.api_user_edit(params, json_data)
-    
+
     if user['code'] != 200 and user['message'] == "Can't edit that user":
         flash("Can't edit that user!")
 
