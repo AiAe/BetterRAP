@@ -5,8 +5,8 @@
     <div class="card-body">
         <blockquote class="card-blockquote">
             <h2>Welcome to Ripple Support.</h2>
-            <p>If you have any account related issues such as <a href="/namechange">name change</a> requests, 
-                <a href=""flag change</a> requests or <a href="">restriction appeals</a>, this is the place to do it. 
+            <p>If you have any account related issues such as <a href="{{ url_for('request_namechange') }}">name change</a> requests, 
+                <a href=""flag change</a> requests or <a href="{{ url_for('request_banappeal') }}">restriction appeals</a>, this is the place to do it. 
                 If you have any other questions that are unrelated to appeals or name/flag change requests,
                 send us an email at <a href="mailto:support@ripple.moe">support@ripple.moe</a></p>
         </blockquote>
