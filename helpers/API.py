@@ -13,7 +13,7 @@ def api_user_full(user_id, token):
 def api_user_username(user_id):
     user = requests.get('https://api.ripple.moe/api/v1/users', params={'id': user_id}).json()
 
-    return user['username']
+    return user
 
 
 def api_user_check(username, token):

@@ -231,7 +231,7 @@ def request_banappeal():
     if not API.user_logged_in() or not API.is_restricted():
         return redirect(url_for('index'))
 
-    user_id = API.api_user_username(API.user_exist()['user_id'])
+    user = API.api_user_username(API.user_exist()['user_id'])
     user_privilege = API.user_privilege()
 
     if request.method == 'POST':
@@ -267,7 +267,7 @@ def request_banappeal():
             except:
                 flash("I see you really want to get unrestricted, don't we will review your appeal soon.")
 
-    return render_template('banappeal.html', user=user_id, user_privilege=user_privilege)
+    return render_template('banappeal.html', user=user, user_privilege=user_privilege)
 
 
 @app.route('/namechange/', methods=['GET', 'POST'])
@@ -275,7 +275,7 @@ def request_namechange():
     if not API.user_logged_in() or not API.is_user():
         return redirect(url_for('index'))
 
-    user_id = API.api_user_username(API.user_exist()['user_id'])
+    user = API.api_user_username(API.user_exist()['user_id'])
     user_privilege = API.user_privilege()
 
     if request.method == 'POST':
@@ -306,7 +306,7 @@ def request_namechange():
             except:
                 flash('You have still pending username change!')
 
-    return render_template('namechange.html', user=user_id, user_privilege=user_privilege)
+    return render_template('namechange.html', user=user, user_privilege=user_privilege)
 
 
 @app.route('/manage/usernamechanges/')
@@ -314,13 +314,13 @@ def manage_usernamechanges():
     if not API.is_chatmod():
         return redirect(url_for('index'))
 
-    user_id = API.api_user_username(API.user_exist()['user_id'])
+    user = API.api_user_username(API.user_exist()['user_id'])
     user_privilege = API.user_privilege()
 
     connection, cursor = mysql.connect()
     get_requests = mysql.execute(connection, cursor,
                                  "SELECT * FROM requests WHERE category = 1").fetchall()
-    return render_template('manageusernamechanges.html', user=user_id, user_privilege=user_privilege, r=get_requests)
+    return render_template('manageusernamechanges.html', user=user, user_privilege=user_privilege, r=get_requests)
 
 
 @app.route('/manage/banappeals/')
@@ -328,13 +328,13 @@ def manage_banappeals():
     if not API.is_admin():
         return redirect(url_for('index'))
 
-    user_id = API.api_user_username(API.user_exist()['user_id'])
+    user = API.api_user_username(API.user_exist()['user_id'])
     user_privilege = API.user_privilege()
 
     connection, cursor = mysql.connect()
     get_requests = mysql.execute(connection, cursor,
                                  "SELECT * FROM requests WHERE category = 2").fetchall()
-    return render_template('managebanappeals.html', user=user_id, user_privilege=user_privilege, r=get_requests)
+    return render_template('managebanappeals.html', user=user, user_privilege=user_privilege, r=get_requests)
 
 
 @app.route('/logs/')
