@@ -28,7 +28,7 @@ def user_logged_in():
 
         connection, cursor = mysql.connect()
 
-        user = mysql.execute(connection, cursor, "SELECT user_id FROM users WHERE access_token = %s",
+        user = mysql.execute(connection, cursor, "SELECT user_id, perm FROM users WHERE access_token = %s",
                              [access_token]).fetchone()
 
         perm = api_user_privileges(user['user_id'])
@@ -37,7 +37,7 @@ def user_logged_in():
             mysql.execute(connection, cursor, "UPDATE users SET perm = %s WHERE access_token = %s", [0, access_token])
 
         else:
-            if perm == 0:
+            if user['perm'] == 0:
                 mysql.execute(connection, cursor, "UPDATE users SET perm = %s WHERE access_token = %s", [1, access_token])
 
         return True
