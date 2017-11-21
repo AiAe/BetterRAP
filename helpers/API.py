@@ -1,23 +1,33 @@
 from flask import request
 import requests
+import json
 from datetime import datetime
 from helpers import mysql
 
+path = ''
+path = '/home/ubuntu/CONFIG/'
 
-def api_user_full(user_id, token):
-    user = requests.get('https://api.ripple.moe/api/v1/users/full', params={'id': user_id, 'token': token}).json()
+with open(path + "ripple.json", "r") as f:
+    ripple_config = json.load(f)
+
+
+def api_user_full(user_id):
+    user = requests.get('https://api.ripple.moe/api/v1/users/full',
+                        params={'id': user_id, 'token': ripple_config['token']}).json()
 
     return user
 
 
 def api_user_username(user_id):
-    user = requests.get('https://api.ripple.moe/api/v1/users', params={'id': user_id}).json()
+    user = requests.get('https://api.ripple.moe/api/v1/users',
+                        params={'id': user_id, 'token': ripple_config['token']}).json()
 
     return user
 
 
-def api_user_check(username, token):
-    user = requests.get('https://api.ripple.moe/api/v1/users', params={'name': username, 'token': token}).json()
+def api_user_check(username):
+    user = requests.get('https://api.ripple.moe/api/v1/users',
+                        params={'name': username, 'token': ripple_config['token']}).json()
 
     if int(user["code"]) == 404:
         return False
@@ -26,8 +36,21 @@ def api_user_check(username, token):
         return True
 
 
+def api_osu_user_check(username):
+    user = requests.get('https://osu.ppy.sh/api/get_user', params={'u': username, 'k': ripple_config['osu_api']}).json()
+    print(user)
+    if user:
+
+        return True
+
+    else:
+
+        return False
+
+
 def api_user_privileges(user_id):
-    user = requests.get('https://api.ripple.moe/api/v1/users', params={'id': user_id}).json()
+    user = requests.get('https://api.ripple.moe/api/v1/users',
+                        params={'id': user_id, 'token': ripple_config['token']}).json()
 
     return user['privileges']
 
@@ -66,7 +89,8 @@ def user_logged_in():
 
         else:
             if user['perm'] == 0:
-                mysql.execute(connection, cursor, "UPDATE users SET perm = %s WHERE access_token = %s", [1, access_token])
+                mysql.execute(connection, cursor, "UPDATE users SET perm = %s WHERE access_token = %s",
+                              [1, access_token])
 
         return True
 
