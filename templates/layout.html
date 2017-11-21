@@ -25,7 +25,7 @@
             <a class="item" href="{{ url_for('home') }}">Home</a>
             {% if user_privilege.perm >= 1 %}
             <a class="item" href="{{ url_for('request_namechange') }}">Name change</a>
-            <a class="item" href="#">Flag change</a>
+            <!--<a class="item" href="#">Flag change</a>-->
             {% endif %}
             {% if user_privilege.perm == 0 %}
             <a class="item" href="{{ url_for('request_banappeal') }}">Ban Appeal</a>
