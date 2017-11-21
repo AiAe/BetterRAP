@@ -7,7 +7,7 @@ import json
 from flask_mail import Mail, Message
 from helpers import mysql, API
 
-#path = ''
+path = ''
 path = '/home/ubuntu/CONFIG/'
 
 with open(path + "config.json", "r") as f:
@@ -136,6 +136,31 @@ def home():
     return render_template('home.html', user=user_id, user_privilege=user_privilege)
 
 
+@app.route('/deny/')
+def api_user_deny():
+    if not request.args:
+        return 'I love hackers'
+
+    u = API.user_exist()
+    username = API.api_user_username(u['user_id'])
+    connection, cursor = mysql.connect()
+
+    text = 'Deny username change from {} to {}'.format(request.args['u'], request.args['username'])
+
+    API.logging(username, u["user_id"], text)
+
+    mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s",
+                  [request.args['user_id']])
+
+    get_email = API.api_user_full(request.args['user_id'], ripple_config['token'])["email"]
+
+    send_email(get_email, 5)
+
+    flash('Deny username change from {} to {}.'.format(request.args['u'], request.args['username']))
+
+    return redirect(url_for('manage_usernamechanges'))
+
+
 @app.route('/request/')
 def api_user_edit():
     if not request.args:
@@ -164,8 +189,8 @@ def api_user_edit():
 
         API.logging(username, u["user_id"], text)
 
-        mysql.execute(connection, cursor, "DELETE from requests WHERE new_username = %s",
-                      [request.args['username']])
+        mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s",
+                      [request.args['user_id']])
 
         get_email = API.api_user_full(request.args['user_id'], ripple_config['token'])["email"]
 
