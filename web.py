@@ -290,7 +290,11 @@ def request_namechange():
         if not re.match(regex, username):
             flash("Failed to verify username, please don't use special characters.")
 
-        if username and re.match(regex, username):
+        if not API.api_user_check(username, ripple_config['token']):
+
+            flash("Username is in use!")
+
+        if username and re.match(regex, username) and API.api_user_check(username, ripple_config['token']):
             connection, cursor = mysql.connect()
             try:
                 mysql.execute(connection, cursor,
