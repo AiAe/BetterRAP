@@ -156,7 +156,7 @@ def api_user_deny():
 
     text = 'Deny username change from {} to {}'.format(request.args['u'], request.args['username'])
 
-    API.logging(username, u["user_id"], text)
+    API.logging(username['username'], u["user_id"], text)
 
     mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s",
                   [user_id])
@@ -209,7 +209,7 @@ def api_user_edit():
 
         text = 'Changed username from {} to {}'.format(user["username"], request.args['username'])
 
-        API.logging(username, u["user_id"], text)
+        API.logging(username['username'], u["user_id"], text)
 
         mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s",
                       [user_id])
@@ -259,7 +259,7 @@ def request_banappeal():
             try:
                 mysql.execute(connection, cursor,
                               "INSERT INTO requests (user_id, username, category, text, date) VALUES (%s, %s, %s, %s, %s)",
-                              [user_id, API.api_user_username(user_id), 2, text,
+                              [user['id'], user['username'], 2, text,
                                datetime.now().strftime('%d.%m.%Y %H:%M')])
 
                 flash('Thanks for appealing, it can take up to 7 days for us to review.')
@@ -299,7 +299,7 @@ def request_namechange():
             try:
                 mysql.execute(connection, cursor,
                               "INSERT INTO requests (user_id, username, category, used, new_username, date) VALUES (%s, %s, %s, %s, %s, %s)",
-                              [API.user_exist()['user_id'], user_id, 1, 0,
+                              [user['id'], user['username'], 1, 0,
                                username,
                                dt.now().strftime('%d.%m.%Y %H:%M')])
                 flash('Your request is added to pending.')
