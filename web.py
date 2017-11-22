@@ -8,7 +8,7 @@ from flask_mail import Mail, Message
 from helpers import mysql, API
 
 path = ''
-path = '/home/ubuntu/CONFIG/'
+# path = '/home/ubuntu/CONFIG/'
 
 with open(path + "config.json", "r") as f:
     config = json.load(f)
@@ -136,47 +136,8 @@ def home():
     return render_template('home.html', user=user_id, user_privilege=user_privilege)
 
 
-@app.route('/deny/')
-def api_user_deny():
-    if not API.is_chatmod():
-        return redirect(url_for('index'))
-
-    if not request.args:
-        return 'I love hackers'
-
-    user_id = request.args['user_id']
-
-    if not API.user_in_db(user_id):
-        return 'kys'
-
-    u = API.user_exist()
-    username = API.api_user_username(u['user_id'])
-    connection, cursor = mysql.connect()
-
-    text = 'Deny username change from {} to {}'.format(request.args['u'], request.args['username'])
-
-    API.logging(username['username'], u["user_id"], text)
-
-    mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s",
-                  [user_id])
-
-    get_email = API.api_user_full(user_id)["email"]
-
-    try:
-        send_email(get_email, 5)
-    except:
-        flash('Failed to send, email is not valid.')
-
-    flash('Deny username change from {} to {}.'.format(request.args['u'], request.args['username']))
-
-    return redirect(url_for('manage_usernamechanges'))
-
-
-@app.route('/request/')
-def api_user_edit():
-    if not API.is_chatmod():
-        return redirect(url_for('index'))
-
+@app.route('/action/')
+def api_action():
     if not request.args:
         return 'I love hackers'
 
@@ -189,38 +150,77 @@ def api_user_edit():
         'token': ripple_config['token'],
     }
 
-    json_data = {
-        'id': int(request.args['user_id']),
-        'username': str(request.args['username'])
-    }
+    action = int(request.args['action'])
 
-    user = API.api_user_edit(params, json_data)
+    connection, cursor = mysql.connect()
 
-    if user['code'] != 200 and user['message'] == "Can't edit that user":
-        flash("Can't edit that user!")
+    if action == 1 or action == 2:
 
+        if not API.is_chatmod() or not API.user_in_db(user_id):
+            return redirect(url_for('index'))
+
+        # Name change approve
+        if action == 1:
+            json_data = {
+                'id': int(request.args['user_id']),
+                'username': str(request.args['username'])
+            }
+
+            user = API.api_user_edit(params, json_data)
+
+            if user['code'] != 200 and user['message'] == "Can't edit that user":
+                flash("Can't edit that user!")
+
+            else:
+                u = API.user_exist()
+                username = API.api_user_username(u['user_id'])
+                text = 'Changed username from {} to {}'.format(user["username"], request.args['username'])
+                API.logging(username['username'], u["user_id"], text)
+                mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s", [user_id])
+                get_email = API.api_user_full(user_id)["email"]
+
+                try:
+                    send_email(get_email, 2)
+                except:
+                    flash('Failed to send, email is not valid.')
+
+                flash('Changed username from {} to {}.'.format(user["username"],
+                                                               request.args['username']))
+
+            return redirect(url_for('manage_usernamechanges'))
+
+        # Name change deny
+        elif action == 2:
+            u = API.user_exist()
+            username = API.api_user_username(u['user_id'])
+            text = 'Deny username change from {} to {}'.format(request.args['u'], request.args['username'])
+            API.logging(username['username'], u["user_id"], text)
+            mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s", [user_id])
+            get_email = API.api_user_full(user_id)["email"]
+
+            try:
+                send_email(get_email, 5)
+            except:
+                flash('Failed to send, email is not valid.')
+
+            flash('Deny username change from {} to {}.'.format(request.args['u'], request.args['username']))
+
+            return redirect(url_for('manage_usernamechanges'))
     else:
-        u = API.user_exist()
-        username = API.api_user_username(u['user_id'])
-        connection, cursor = mysql.connect()
+        if not API.is_admin():
+            return redirect(url_for('index'))
 
-        text = 'Changed username from {} to {}'.format(user["username"], request.args['username'])
+        # Unrestrict approve
+        if action == 3:
 
-        API.logging(username['username'], u["user_id"], text)
+            return ''
 
-        mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s",
-                      [user_id])
+        # Unrestrict deny
+        elif action == 4:
 
-        get_email = API.api_user_full(user_id)["email"]
+            return ''
 
-        try:
-            send_email(get_email, 2)
-        except:
-            flash('Failed to send, email is not valid.')
-
-        flash('Changed username from {} to {}.'.format(user["username"],
-                                                       request.args['username']))
-    return redirect(url_for('manage_usernamechanges'))
+    return 'what'
 
 
 @app.route('/banappeal/', methods=['GET', 'POST'])
@@ -243,13 +243,7 @@ def request_banappeal():
         if not all([q1, q2, q3, q4, q5, q6]):
             flash('Please fill everything!')
         else:
-            text = "List any and all other accounts you have used or created: {}\n" \
-                   "Is this your first time being restricted: {}\n" \
-                   "If this isn't your first time being restricted, why were you restricted in the past: {}\n" \
-                   "Let us know what caused your most recent restriction/ban: {}\n" \
-                   "Why should we allow you back into Ripple? (3-6 sentences): {}\n" \
-                   "Write a 1-2 paragraphs (6-12 sentences) about how if we let you back into Ripple, you won't break anymore rules: {}".format(
-                q1, q2, q3, q4, q5, q6)
+            text = "{}\n{}\n{}\n{}\n{}\n{}\n".format(q1, q2, q3, q4, q5, q6)
 
             connection, cursor = mysql.connect()
 
@@ -337,6 +331,25 @@ def manage_banappeals():
     get_requests = mysql.execute(connection, cursor,
                                  "SELECT * FROM requests WHERE category = 2").fetchall()
     return render_template('managebanappeals.html', user=user, user_privilege=user_privilege, r=get_requests)
+
+
+@app.route('/manage/read/')
+def manage_read():
+    if not API.user_logged_in() or not API.is_admin():
+        return redirect(url_for('index'))
+
+    if not request.args:
+        return 'kys'
+
+    user_id = request.args['user_id']
+
+    user = API.api_user_username(API.user_exist()['user_id'])
+    user_privilege = API.user_privilege()
+
+    connection, cursor = mysql.connect()
+    get_text = mysql.execute(connection, cursor,
+                             "SELECT user_id, username, text FROM requests WHERE user_id = %s", [user_id]).fetchone()
+    return render_template('read.html', user=user, user_privilege=user_privilege, r=get_text)
 
 
 @app.route('/logs/')
