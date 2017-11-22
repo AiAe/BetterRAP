@@ -37,9 +37,10 @@ app.config['MAIL_DEBUG'] = False
 mail = Mail()
 mail.init_app(app)
 
+
 def rtheme():
 
-    if request.cookies.get('cflags') == 1:
+    if request.cookies.get('cflags') == 1 or request.cookies.get('cflags') == "1":
 
         return {'theme': 'ds', 'logo': 'white', 'css': 'css/semantic.min.dark.css'}
 
