@@ -1,0 +1,4 @@
+PyMySQL==0.7.11
+requests==2.18.1
+Flask==0.12.2
+Flask_Mail==0.9.1
