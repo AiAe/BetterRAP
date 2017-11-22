@@ -262,22 +262,20 @@ def request_banappeal():
     if not API.user_logged_in() or not API.is_restricted():
         return redirect(url_for('index'))
 
+    inputs = {'q1': "", 'q2': "", 'q3': "", 'q4': "", 'q5': "", 'q6': ""}
+
     user = API.api_user_username(API.user_exist()['user_id'])
     user_privilege = API.user_privilege()
 
     if request.method == 'POST':
 
-        q1 = request.form['q1']
-        q2 = request.form['q2']
-        q3 = request.form['q3']
-        q4 = request.form['q4']
-        q5 = request.form['q5']
-        q6 = request.form['q6']
+        inputs = {'q1': request.form['q1'], 'q2': request.form['q2'], 'q3': request.form['q3'],
+                  'q4': request.form['q4'], 'q5': request.form['q5'], 'q6': request.form['q6']}
 
-        if not all([q1, q2, q3, q4, q5, q6]):
+        if not all([inputs['q1'], inputs['q2'], inputs['q3'], inputs['q4'], inputs['q5'], inputs['q6']]):
             flash('Please fill everything!')
         else:
-            text = "{}\n{}\n{}\n{}\n{}\n{}\n".format(q1, q2, q3, q4, q5, q6)
+            text = "{q1}\n{q2}\n{q3}\n{q4}\n{q5}\n{q6}\n".format(**inputs)
 
             connection, cursor = mysql.connect()
 
@@ -292,7 +290,7 @@ def request_banappeal():
             except:
                 flash("I see you really want to get unrestricted, don't we will review your appeal soon.")
 
-    return render_template('banappeal.html', user=user, user_privilege=user_privilege)
+    return render_template('banappeal.html', user=user, user_privilege=user_privilege, fields=inputs)
 
 
 @app.route('/namechange/', methods=['GET', 'POST'])
