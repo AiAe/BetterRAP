@@ -37,6 +37,14 @@ app.config['MAIL_DEBUG'] = False
 mail = Mail()
 mail.init_app(app)
 
+def rtheme():
+
+    if int(request.cookies.get('cflags')) == 1:
+
+        return {'theme': 'ds', 'logo': 'white'}
+
+    return {'theme': '', 'logo': 'black'}
+
 
 def send_email(email, d):
     if d == 0:
@@ -122,7 +130,7 @@ def index():
         return redirect(url_for('home'))
 
     return render_template('login.html', client_id=ripple_config['client_id'],
-                           redirect_url=ripple_config['redirect_url'])
+                           redirect_url=ripple_config['redirect_url'], rtheme=rtheme())
 
 
 @app.route('/home/')
@@ -133,7 +141,7 @@ def home():
     user_id = API.api_user_username(API.user_exist()['user_id'])
     user_privilege = API.user_privilege()
 
-    return render_template('home.html', user=user_id, user_privilege=user_privilege)
+    return render_template('home.html', user=user_id, user_privilege=user_privilege, rtheme=rtheme())
 
 
 @app.route('/action/')
@@ -291,7 +299,7 @@ def request_banappeal():
                 flash("I see you really want to get unrestricted, don't we will review your appeal soon.")
 
     return render_template('banappeal.html', user=user, user_privilege=user_privilege, fields=inputs,
-                           db=API.user_in_db(user['id']), email=API.api_user_email(user['id']))
+                           db=API.user_in_db(user['id']), email=API.api_user_email(user['id']), rtheme=rtheme())
 
 
 @app.route('/namechange/', methods=['GET', 'POST'])
@@ -336,7 +344,7 @@ def request_namechange():
                 flash('You have still pending username change!')
 
     return render_template('namechange.html', user=user, user_privilege=user_privilege, db=API.user_in_db(user['id']),
-                           email=API.api_user_email(user['id']))
+                           email=API.api_user_email(user['id']), rtheme=rtheme())
 
 
 @app.route('/manage/usernamechanges/')
@@ -350,7 +358,7 @@ def manage_usernamechanges():
     connection, cursor = mysql.connect()
     get_requests = mysql.execute(connection, cursor,
                                  "SELECT * FROM requests WHERE category = 1").fetchall()
-    return render_template('manageusernamechanges.html', user=user, user_privilege=user_privilege, r=get_requests)
+    return render_template('manageusernamechanges.html', user=user, user_privilege=user_privilege, r=get_requests, rtheme=rtheme())
 
 
 @app.route('/manage/banappeals/')
@@ -364,7 +372,7 @@ def manage_banappeals():
     connection, cursor = mysql.connect()
     get_requests = mysql.execute(connection, cursor,
                                  "SELECT * FROM requests WHERE category = 2").fetchall()
-    return render_template('managebanappeals.html', user=user, user_privilege=user_privilege, r=get_requests)
+    return render_template('managebanappeals.html', user=user, user_privilege=user_privilege, r=get_requests, rtheme=rtheme())
 
 
 @app.route('/manage/read/')
@@ -383,7 +391,7 @@ def manage_read():
     connection, cursor = mysql.connect()
     get_text = mysql.execute(connection, cursor,
                              "SELECT user_id, username, text FROM requests WHERE user_id = %s", [user_id]).fetchone()
-    return render_template('read.html', user=user, user_privilege=user_privilege, r=get_text)
+    return render_template('read.html', user=user, user_privilege=user_privilege, r=get_text, rtheme=rtheme())
 
 
 @app.route('/logs/')
@@ -397,7 +405,7 @@ def logs():
     connection, cursor = mysql.connect()
     get_requests = mysql.execute(connection, cursor,
                                  "SELECT * FROM logs ORDER BY id desc").fetchall()
-    return render_template('logs.html', user=user_id, user_privilege=user_privilege, r=get_requests)
+    return render_template('logs.html', user=user_id, user_privilege=user_privilege, r=get_requests, rtheme=rtheme())
 
 
 @app.errorhandler(404)
