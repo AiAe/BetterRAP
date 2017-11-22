@@ -18,6 +18,13 @@ def api_user_full(user_id):
     return user
 
 
+def api_user_email(user_id):
+    user = requests.get('https://api.ripple.moe/api/v1/users/full',
+                        params={'id': user_id, 'token': ripple_config['token']}).json()
+
+    return user["email"]
+
+
 def api_user_username(user_id):
     user = requests.get('https://api.ripple.moe/api/v1/users',
                         params={'id': user_id, 'token': ripple_config['token']}).json()

@@ -290,7 +290,7 @@ def request_banappeal():
             except:
                 flash("I see you really want to get unrestricted, don't we will review your appeal soon.")
 
-    return render_template('banappeal.html', user=user, user_privilege=user_privilege, fields=inputs)
+    return render_template('banappeal.html', user=user, user_privilege=user_privilege, fields=inputs, db=API.user_in_db(user['id']), email=API.api_user_email(user['id']))
 
 
 @app.route('/namechange/', methods=['GET', 'POST'])
@@ -334,7 +334,7 @@ def request_namechange():
             except:
                 flash('You have still pending username change!')
 
-    return render_template('namechange.html', user=user, user_privilege=user_privilege)
+    return render_template('namechange.html', user=user, user_privilege=user_privilege, db=API.user_in_db(user['id']), email=API.api_user_email(user['id']))
 
 
 @app.route('/manage/usernamechanges/')

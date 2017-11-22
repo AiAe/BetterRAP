@@ -1,15 +1,11 @@
 {% extends 'layout.html' %}
 {% block title %} Ban appeal {% endblock %}
 {% block body %}
-<!--<div class="alert alert-dismissible alert-danger">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-    It has not been one month since your restriction.<br>
-    Therefore you'll have to wait a bit longer before you can appeal.<br>
-    Your appeal date is: <strong>12/12/2020</strong>.<br>
-    But if you think your ban was wrong you can send appeal.
-</div>-->
 <div class="card text-black bg-light">
     <div class="card-body">
+        {% if db == true %}
+        You have already submitted an appeal. You should receive a response at your email address: {{ email }} soon.
+        {% else %}
         <form id="register-form" class="ui form" lpformnum="1" _lpchecked="1" role="form" method="post"
               action="{{ url_for('request_banappeal') }}"
               accept-charset="UTF-8">
@@ -50,6 +46,7 @@
             </div>
             <input type="submit" class="ui primary button" value="Send">
         </form>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
