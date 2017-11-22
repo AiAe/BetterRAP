@@ -15,7 +15,6 @@
             <ul>
                 {% if user_privilege.perm >= 1 %}
                     <li><a href="{{ url_for('request_namechange') }}">Name Changes</a></li>
-                    <li><a href="/">Flag Changes</a></li>
                 {% endif %}
 
                 {% if user_privilege.perm == 0 %}
