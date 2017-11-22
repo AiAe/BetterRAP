@@ -60,6 +60,10 @@ def api_user_edit(params, json_data):
                          json=json_data).json()
 
 
+def api_user_unrestrict(params, json_data):
+    return requests.post('https://api.ripple.moe/api/v1/users/manage/set_allowed', params=params, json=json_data)
+
+
 def user_in_db(user_id):
     connection, cursor = mysql.connect()
 
