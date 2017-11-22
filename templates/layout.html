@@ -34,7 +34,7 @@
                 {% if user_privilege.perm > 1 %}
                 <div class="ui dropdown item">
                     <span><strong>BetterRAP</strong></span>
-                    <div class="menu">
+                    <div class="menu" style="display:inline;">
                         {% if user_privilege.perm >= 2 %}
                         <a class="item" href="{{ url_for('manage_usernamechanges') }}">Manage Name Changes</a>
                         {% endif %}
@@ -45,7 +45,7 @@
                     </div>
                 </div>
                 {% endif %}
-                <div class="ui dropdown item">
+                <div class="ui dropdown item" style="display:inline;">
                     <span><img class="ui avatar image" src="https://a.ripple.moe/{{ user.id }}"> {{ user.username }}</span>
                     <div class="menu">
                         <a class="item">{{ user_privilege.badge }}</a>
@@ -75,6 +75,7 @@
         </div>
     </div>
 </div>
+<script src="//twemoji.maxcdn.com/2/twemoji.min.js?2.2"></script>
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dist.min.js') }}"></script>
 </body>
