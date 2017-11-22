@@ -214,16 +214,15 @@ def api_action():
         if action == 3:
 
             json_data = {
-                'id': int(request.args['user_id']),
+                'user_id': int(request.args['user_id']),
                 'allowed': 1
             }
-            # Not too sure what to send to allowed
 
-            user = API.api_user_edit(params, json_data)
+            API.api_user_unrestrict(params, json_data)
 
             u = API.user_exist()
             username = API.api_user_username(u['user_id'])
-            text = '{} is unrestricted'.format(user['username'])
+            text = '{} is unrestricted'.format(request.args['username'])
             API.logging(username['username'], u["user_id"], text)
             mysql.execute(connection, cursor, "DELETE from requests WHERE user_id = %s", [user_id])
             get_email = API.api_user_full(user_id)["email"]
@@ -233,7 +232,7 @@ def api_action():
             except:
                 flash('Failed to send, email is not valid.')
 
-            flash('{} is unrestricted'.format(user["username"]))
+            flash('{} is unrestricted'.format(request.args['user_id']))
 
             return redirect(url_for('manage_banappeals'))
 
