@@ -39,7 +39,7 @@ mail.init_app(app)
 
 def rtheme():
 
-    if int(request.cookies.get('cflags')) == 1:
+    if request.cookies.get('cflags') == 1:
 
         return {'theme': 'ds', 'logo': 'white'}
 
