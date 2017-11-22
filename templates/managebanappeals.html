@@ -19,8 +19,8 @@
                 <td><a type="button" class="ui inverted blue button" href="{{ url_for('manage_read', user_id=request.user_id) }}">Read appeal</a></td>
                 <td>{{ request.date }}</td>
                 <td>
-                    <a href="{{ url_for('api_action', action = 3, user_id = request.user_id, username = request.new_username) }}" type="button" class="ui inverted green button">Approve</a>
-                    <a href="{{ url_for('api_action', action = 4, user_id = request.user_id, username = request.new_username, u = request.username) }}" type="button" class="ui inverted red button">Deny</a>
+                    <a href="{{ url_for('api_action', action = 3, user_id = request.user_id, username = request.username) }}" type="button" class="ui inverted green button">Approve</a>
+                    <a href="{{ url_for('api_action', action = 4, user_id = request.user_id, username = request.username) }}" type="button" class="ui inverted red button">Deny</a>
                 </td>
             </tr>
             {% endfor %}
