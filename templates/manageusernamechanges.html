@@ -30,8 +30,8 @@
                 </td>
                 <td>{{ request.date }}</td>
                 <td>
-                    <a href="{{ url_for('api_user_edit', user_id = request.user_id, username = request.new_username) }}" type="button" class="ui inverted green button">Approve</a>
-                    <a href="{{ url_for('api_user_deny', user_id = request.user_id, username = request.new_username, u = request.username) }}" type="button" class="ui inverted red button">Deny</a>
+                    <a href="{{ url_for('api_action', action = 1, user_id = request.user_id, username = request.new_username) }}" type="button" class="ui inverted green button">Approve</a>
+                    <a href="{{ url_for('api_action', action = 2, user_id = request.user_id, username = request.new_username, u = request.username) }}" type="button" class="ui inverted red button">Deny</a>
                 </td>
             </tr>
             {% endfor %}
