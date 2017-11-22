@@ -285,12 +285,13 @@ def request_banappeal():
                               [user['id'], user['username'], 2, text,
                                dt.now().strftime('%d.%m.%Y %H:%M')])
 
-                flash('Thanks for appealing, it can take up to 7 days for us to review.')
+                #flash('Thanks for appealing, it can take up to 7 days for us to review.')
 
             except:
                 flash("I see you really want to get unrestricted, don't we will review your appeal soon.")
 
-    return render_template('banappeal.html', user=user, user_privilege=user_privilege, fields=inputs, db=API.user_in_db(user['id']), email=API.api_user_email(user['id']))
+    return render_template('banappeal.html', user=user, user_privilege=user_privilege, fields=inputs,
+                           db=API.user_in_db(user['id']), email=API.api_user_email(user['id']))
 
 
 @app.route('/namechange/', methods=['GET', 'POST'])
@@ -330,11 +331,12 @@ def request_namechange():
                               [user['id'], user['username'], 1, used,
                                username,
                                dt.now().strftime('%d.%m.%Y %H:%M')])
-                flash('Your request is added to pending.')
+                #flash('Your request is added to pending.')
             except:
                 flash('You have still pending username change!')
 
-    return render_template('namechange.html', user=user, user_privilege=user_privilege, db=API.user_in_db(user['id']), email=API.api_user_email(user['id']))
+    return render_template('namechange.html', user=user, user_privilege=user_privilege, db=API.user_in_db(user['id']),
+                           email=API.api_user_email(user['id']))
 
 
 @app.route('/manage/usernamechanges/')
