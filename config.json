@@ -1,5 +1,5 @@
 {
-  "debug": "True",
+  "debug": "False",
   "use_reloader": "True",
   "threaded": "True",
   "host": "127.0.0.1",
