@@ -34,7 +34,7 @@
                 {% if user_privilege.perm > 1 %}
                 <div class="ui dropdown item">
                     <span><strong>BetterRAP</strong></span>
-                    <div class="menu" style="display:none;">
+                    <div class="menu" style="display:inline-block;">
                         {% if user_privilege.perm >= 2 %}
                         <a class="item" href="{{ url_for('manage_usernamechanges') }}">Manage Name Changes</a>
                         {% endif %}
@@ -45,9 +45,9 @@
                     </div>
                 </div>
                 {% endif %}
-                <div class="ui dropdown item" style="display:none;">
+                <div class="ui dropdown item">
                     <span><img class="ui avatar image" src="https://a.ripple.moe/{{ user.id }}"> {{ user.username }}</span>
-                    <div class="menu">
+                    <div class="menu" style="display:inline-block;">
                         <a class="item">{{ user_privilege.badge }}</a>
                         <a class="item" href="{{ url_for('ripple_logout') }}">Logout</a>
                     </div>
