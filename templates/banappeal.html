@@ -5,7 +5,7 @@
     <div class="card-body">
         {% if db == true %}
         <div class="ui error message">
-            You have already submitted an appeal. You should receive a response at your email address: {{ email }} soon.
+            You have already submitted an appeal. You should receive a response at your email address: <b>{{ email }}</b> soon.
         </div>
         {% else %}
         <form id="register-form" class="ui form" lpformnum="1" _lpchecked="1" role="form" method="post"
