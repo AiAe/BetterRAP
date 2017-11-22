@@ -13,7 +13,8 @@
     <link rel="shortcut icon"
           href="{{ url_for('static', filename='img/eggplant.png') }}"/>
 </head>
-<body class="{{ rtheme.theme }}">
+<body {% if rtheme.theme==
+"ds" %}class="ds"{% endif %}>
 <div class="ui full height main wrapper">
     <div class="ui secondary fixed-height stackable white background main menu no margin bottom" id="navbar">
         <div class="ui container">
@@ -46,7 +47,8 @@
                 </div>
                 {% endif %}
                 <div class="ui dropdown item">
-                    <span><img class="ui avatar image" src="https://a.ripple.moe/{{ user.id }}"> {{ user.username }}</span>
+                    <span><img class="ui avatar image"
+                               src="https://a.ripple.moe/{{ user.id }}"> {{ user.username }}</span>
                     <div class="menu">
                         <a class="item">{{ user_privilege.badge }}</a>
                         <a class="item" href="{{ url_for('ripple_logout') }}">Logout</a>
@@ -75,7 +77,6 @@
         </div>
     </div>
 </div>
-<script src="//twemoji.maxcdn.com/2/twemoji.min.js?2.2"></script>
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dist.min.js') }}"></script>
 </body>
