@@ -4,7 +4,7 @@
 <div class="card text-black bg-light">
     <div class="card-body">
         {% if db == true %}
-        <div class="ui warning message">
+        <div class="ui error message">
             You have already submitted an appeal. You should receive a response at your email address: {{ email }} soon.
         </div>
         {% else %}
