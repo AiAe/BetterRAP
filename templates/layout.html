@@ -10,11 +10,12 @@
           href="{{ url_for('static', filename=rtheme.css) }}">
     <link type="text/css" rel="stylesheet"
           href="{{ url_for('static', filename='css/ripple.css') }}">
+    <link type="text/css" rel="stylesheet"
+          href="{{ url_for('static', filename='css/transition.min.css') }}">
     <link rel="shortcut icon"
           href="{{ url_for('static', filename='img/eggplant.png') }}"/>
 </head>
-<body {% if rtheme.theme==
-"ds" %}class="ds"{% endif %}>
+<body {% if rtheme.theme=="ds" %}class="ds"{% endif %}>
 <div class="ui full height main wrapper">
     <div class="ui secondary fixed-height stackable white background main menu no margin bottom" id="navbar">
         <div class="ui container">
@@ -79,5 +80,9 @@
 </div>
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/semantic.min.js') }}"></script>
+<script>
+    $('.ui.dropdown')
+  .dropdown();
+</script>
 </body>
 </html>

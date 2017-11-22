@@ -2,7 +2,7 @@
 {% block title %} Welcome to Ripple Support {% endblock %}
 {% block body %}
 <div class="card text-black bg-light">
-     <div class="ui center aligned"><center><img src="/static/img/logo-pink-dark.svg"></center></div>
+     <div class="ui center aligned"><center><img src="{{ url_for('static', filename=rtheme.header) }}"></center></div>
     <div class="card-body">
         <blockquote class="card-blockquote">
             <h1>Welcome to Ripple Support, {{ user.username }}!</h1>

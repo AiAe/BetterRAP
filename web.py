@@ -42,9 +42,9 @@ def rtheme():
 
     if request.cookies.get('cflags') == 1 or request.cookies.get('cflags') == "1":
 
-        return {'theme': 'ds', 'logo': 'white', 'css': 'css/semantic.min.dark.css'}
+        return {'theme': 'ds', 'logo': 'white', 'css': 'css/semantic.min.dark.css', 'header': 'img/logo-pink-dark.svg'}
 
-    return {'theme': '', 'logo': 'black', 'css': 'css/semantic.min.white.css'}
+    return {'theme': '', 'logo': 'black', 'css': 'css/semantic.min.white.css', 'header': 'img/logo-blue.svg'}
 
 
 def send_email(email, d):
