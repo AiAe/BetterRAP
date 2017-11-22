@@ -1,10 +1,7 @@
 import pymysql
 import json
 
-path = ''
-path = '/home/ubuntu/CONFIG/'
-
-with open(path + "mysql.json", "r") as f:
+with open("mysql.json", "r") as f:
     config = json.load(f)
 
 

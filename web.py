@@ -7,23 +7,20 @@ import json
 from flask_mail import Mail, Message
 from helpers import mysql, API
 
-path = ''
-path = '/home/ubuntu/CONFIG/'
-
-with open(path + "config.json", "r") as f:
+with open("config.json", "r") as f:
     config = json.load(f)
 
-with open(path + "email.json", "r") as f:
+with open("email.json", "r") as f:
     config_email = json.load(f)
 
-with open(path + "drafts.json", "r") as f:
+with open("drafts.json", "r") as f:
     draft = json.load(f)
 
-with open(path + "ripple.json", "r") as f:
+with open("ripple.json", "r") as f:
     ripple_config = json.load(f)
 
 app = Flask(__name__)
-app.secret_key = 'betterrapisawesome'
+app.secret_key = 'idkwhattowriteherebutthisisneededforflashsoo'
 
 app.config['MAIL_SERVER'] = config_email['MAIL_SERVER']
 app.config['MAIL_PORT'] = "7337"
@@ -70,7 +67,7 @@ def send_email(email, d):
 
 
 @app.route('/oauth/ripple/')
-def ripple_aouth():
+def ripple_oauth():
     if not request.args:
         return 'I love hackers'
 

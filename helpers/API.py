@@ -4,10 +4,7 @@ import json
 from datetime import datetime
 from helpers import mysql
 
-path = ''
-path = '/home/ubuntu/CONFIG/'
-
-with open(path + "ripple.json", "r") as f:
+with open("ripple.json", "r") as f:
     ripple_config = json.load(f)
 
 
