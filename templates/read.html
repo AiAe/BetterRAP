@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+{% block title %} Reading {{ r.username }}'s appeal{% endblock %}
+{% block body %}
+<div class="card text-black bg-light">
+    <div class="card-body">
+        {% set text = r.text.split('\n') %}
+        <div class="ui form">
+            <div class="field">
+                <label>List any and all other accounts you have used or created:</label>
+                <textarea class="form-control" rows="1" disabled>{{ text[0] }}</textarea>
+            </div>
+            <div class="field">
+                <label>Is this your first time being restricted:</label>
+                <textarea class="form-control" rows="1" disabled>{{ text[1] }}</textarea>
+            </div>
+            <div class="field">
+                <label>If this isn't your first time being restricted, why were you restricted in the past:</label>
+                <textarea class="form-control" rows="2" disabled>{{ text[2] }}</textarea>
+            </div>
+            <div class="field">
+                <label>Let us know what caused your most recent restriction/ban:</label>
+                <textarea class="form-control" rows="2" disabled>{{ text[3] }}</textarea>
+            </div>
+            <div class="field">
+                <label>Why should we allow you back into Ripple? (3-6 sentences):</label>
+                <textarea class="form-control" rows="2" disabled>{{ text[4] }}</textarea>
+            </div>
+            <div class="field">
+                <label>Write 1-2 paragraphs (6-12 sentences) about how if we let you back into Ripple, you won't break
+                    anymore rules:</label>
+                <textarea class="form-control" disabled>{{ text[5] }}</textarea>
+            </div>
+            <div class="field">
+                <a href="" type="button" class="ui inverted green button">Approve</a>
+                <a href="" type="button" class="ui inverted red button">Deny</a>
+                <a href="{{ url_for('manage_banappeals') }}" type="button" class="ui inverted yellow button">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
