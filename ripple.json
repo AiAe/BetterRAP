@@ -1,7 +1,7 @@
 {
   "client_id": "",
   "client_secret": "",
-  "redirect_url": "https://support.ripple.moe/oauth/ripple/",
+  "redirect_url": "",
   "token": "",
   "osu_api": ""
 }
